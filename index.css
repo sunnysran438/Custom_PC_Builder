@@ -527,3 +527,95 @@
              
             background: #0040cc;
          }
+
+    
+    /* ========== REGISTRATION PAGE ONLY ========== */
+
+        .registerSection {
+            
+            padding: 60px 160px 80px;
+            background: #F5F7FF;
+            
+            margin-top: 2%;
+            margin-bottom: 2%;
+            margin-left: 25%;
+            margin-right: 25%;
+            
+        }
+
+       
+
+
+
+        .registerSection h1 {
+            
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 36px;
+        }
+    
+        .regFormGroup {
+            
+            margin-bottom:30px;
+            margin-top: 20px;
+            
+
+        }
+    
+        .regFormGroup label {
+            
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+    
+        .regFormGroup input {
+            
+            width: 580px;
+            height: 40px;
+            padding: 0 12px;
+            
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+            
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+    
+        .regFormGroup input:focus {
+            border-color: #0156FF;
+        }
+    
+        .regBtnSignup {
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            width: 160px;
+            height: 50px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            
+            color: #fff;
+            background: #0156FF;
+            margin-top: 36px;
+            transition: background 0.2s;
+        }
+    
+        .regBtnSignup:hover {
+            background: #0040cc;
+        }
