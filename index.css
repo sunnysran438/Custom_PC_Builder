@@ -1,0 +1,418 @@
+    /* ========== RESET ========== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        color: #1a1a1a;
+        background: #fff;
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    ul {
+        list-style: none;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+    }
+
+    /* ========== TOP BAR ========== */
+    .top-bar {
+        width: 100%;
+        height: 32px;
+        background: #0B0B0B;
+    }
+
+    /* ========== NAVBAR ========== */
+    .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 60px;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+    }
+
+    .navbarLogo svg {
+        width: 55px;
+        height: 45px;
+    }
+
+    .navbarLinks {
+        display: flex;
+        gap: 40px;
+    }
+
+    .navbarLinks a {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a1a;
+        transition: color 0.2s;
+    }
+
+    .navbarLinks a:hover {
+        color: #0156FF;
+    }
+
+    .navbarActions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .navbarActions .search-btn {
+        font-size: 18px;
+        color: #555;
+        transition: color 0.2s;
+    }
+
+    .navbarActions .search-btn:hover {
+        color: #0156FF;
+    }
+
+    .navbarActions .profile-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    /* ========== Banner ========== */
+    .banner {
+        
+        width: 100%;
+        height: 776px;
+        background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+            url('images/Section.png') center/cover no-repeat;
+        
+        
+            display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+    }
+
+    .banner h1 {
+        color: #fff;
+        font-size: 44px;
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.25;
+        max-width: 600px;
+    }
+
+    .bannerSearch {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 30px;
+        overflow: hidden;
+        width: 580px;
+        height: 52px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .bannerSearch input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 0 24px;
+        font-size: 15px;
+        font-family: 'Poppins', sans-serif;
+        color: #333;
+    }
+
+    .bannerSearch input::placeholder {
+        color: #999;
+    }
+
+    .bannerSearch button {
+        background: #0156FF;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 0 28px;
+        height: 100%;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+    }
+
+    .bannerSearch button:hover {
+        background: #0040cc;
+    }
+
+    /* ========== FEATURES ========== */
+    .features {
+        display: flex;
+        justify-content: center;
+        gap: 80px;
+        padding: 60px 60px;
+        background: #fff;
+    }
+
+    .featureItem {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 260px;
+    }
+
+    .featureIcon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: #0156FF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+    }
+
+    .featureIcon svg {
+        width: 24px;
+        height: 24px;
+        fill: #fff;
+    }
+
+    .feature-item h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .featureItem p {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.6;
+    }
+
+    /* ========== BUILD Banner ========== */
+        .buildBanner {
+            width: 100%;
+            height: 675px;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+    
+        .buildBanneContent {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 100px;
+            gap: 24px;
+            position: relative;
+            z-index: 1;
+        }
+    
+        .buildBanner h2 {
+            color: #FFF;
+            font-family: 'Poppins', sans-serif;
+            font-size: 44px;
+            font-weight: 700;
+            line-height: 132.5%;
+            max-width: 795px;
+        }
+    
+        .buildBanner a {
+            display: flex;
+            width: 269px;
+            height: 55px;
+            align-items: center;
+            justify-content: center;
+            background: #0156FF;
+            color: #FFF;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 32px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+    
+        .buildBanner a:hover {
+            background: #0040cc;
+        }
+    
+        .BuildBannerImage {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 1181px;
+            height: 675px;
+            object-fit: cover;
+        }
+
+    /* ========== COMPLETED BUILDS ========== */
+    .completedBuilds {
+        padding: 60px 60px 80px;
+        background: #fff;
+    }
+
+    .completedBuilds h2 {
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 40px;
+    }
+
+    .buildsCarousel {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .carouselArrow {
+        font-size: 28px;
+        color: #0156FF;
+        flex-shrink: 0;
+        transition: transform 0.2s;
+    }
+
+    .carouselArrow:hover {
+        transform: scale(1.2);
+    }
+
+    .buildsGrid {
+        display: flex;
+        gap: 30px;
+        flex: 1;
+    }
+
+    /* ---- Build Card ---- */
+    .buildCard {
+        flex: 1;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #eee;
+        transition: box-shadow 0.2s;
+    }
+
+    .buildCard:hover {
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .buildCardImage {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .buildCardBody {
+        padding: 16px;
+    }
+
+    .buildCardUser {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .buildCardUser img {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .buildCardUser span {
+        font-size: 13px;
+        font-weight: 600;
+        color: #0156FF;
+    }
+
+    .buildCardBody h3 {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .buildCardBody .specs {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    .buildCardFooter {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .buildCardFooter .price {
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .buildCardFooter .stats {
+        display: flex;
+        gap: 14px;
+        font-size: 13px;
+        color: #888;
+    }
+
+    /* ========== FOOTER ========== */
+    .siteFooter {
+        background: #0B0B0B;
+        color: #fff;
+        padding: 60px 100px;
+    }
+
+    .footerColumns {
+        display: flex;
+        gap: 120px;
+    }
+
+    .footerColumn h4 {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .footerColumn ul {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .footerColumn a {
+        font-size: 13px;
+        color: #0156FF;
+        transition: opacity 0.2s;
+    }
+
+    .footerColumn a:hover {
+        opacity: 0.8;
+    }
