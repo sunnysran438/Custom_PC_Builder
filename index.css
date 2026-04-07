@@ -106,7 +106,7 @@
             url('images/Section.png') center/cover no-repeat;
         
         
-            display: flex;
+        display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
@@ -148,12 +148,14 @@
     }
 
     .bannerSearch button {
+       
         background: #0156FF;
         color: #fff;
         font-size: 14px;
         font-weight: 600;
         padding: 0 28px;
-        height: 100%;
+        height:  55px;
+        
         border: none;
         cursor: pointer;
         display: flex;
@@ -533,7 +535,10 @@
 
         .registerSection {
             
-            padding: 60px 160px 80px;
+            padding: 60px 120px 80px;
+            padding-left: 50px;
+            padding-right: 150px;
+            
             background: #F5F7FF;
             
             margin-top: 2%;
@@ -574,7 +579,7 @@
     
         .regFormGroup input {
             
-            width: 580px;
+            width: 120%;
             height: 40px;
             padding: 0 12px;
             
@@ -737,13 +742,14 @@
 
         .buildRowSelected .buildColAvailability {
             
-            font-size: 13px;
+            font-size: 14px;
             color: #1a1a1a;
+            
         }
 
         .buildRowSelected .buildColLocation {
             
-            font-size: 13px;
+            font-size: 14px;
             color: #1a1a1a;
         }
 
@@ -886,4 +892,295 @@
         .buildBtnBuyBuild:hover {
             
             background: #0040cc;
+        }
+
+
+
+
+        /* ========== SEARCH PAGE ONLY ========== */
+        .searchPage {
+            
+            padding: 40px 80px 60px;
+            background: #fff;
+            margin-left: 40px;
+        }
+
+        .searchPageTitle {
+            
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 24px;
+        }
+
+        .searchBackLink {
+           
+            font-size: 14px;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .searchBackLink:hover {
+            
+            color: #0156FF;
+        }
+
+        /* Applied Filters Bar */
+        .searchFiltersBar {
+            
+            margin-bottom: 30px;
+        }
+
+        .searchFiltersBarLabel {
+           
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .searchAppliedFilters {
+            
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .searchFilterTag {
+            
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            background: #fff;
+        }
+
+        .searchFilterTagRemove {
+           
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #e53935;
+            color: #fff;
+            
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        .searchClearAllBtn {
+            
+            padding: 6px 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            
+            font-weight: 600;
+            color: #333;
+            background: #fff;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .searchClearAllBtn:hover {
+            
+            background: #f5f5f5;
+        }
+
+        /* Layout: Sidebar + Results */
+        .searchLayout {
+            
+            display: flex;
+            gap: 80px;
+        }
+            
+
+        /* Sidebar Filters */
+        .searchSidebar {
+           
+            width: 220px;
+            flex-shrink: 0;
+        }
+
+        .searchSidebarTitle {
+            
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .searchClearFilterBtn {
+            
+            display: block;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            
+            font-size: 13px;
+            color: #666;
+            background: #fff;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .searchClearFilterBtn:hover {
+            background: #f5f5f5;
+        }
+
+        .searchFilterSection {
+            
+            margin-bottom: 24px;
+        }
+
+        .searchFilterSectionHeader {
+            
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .searchFilterSectionHeader h4 {
+            
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .searchFilterToggle {
+            
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .searchFilterOption {
+           
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .searchFilterCount {
+            
+            font-size: 12px;
+            color: #999;
+        }
+
+        .searchApplyBtn {
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 40px;
+            
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: #0156FF;
+            margin-top: 16px;
+            transition: background 0.2s;
+        }
+
+        .searchApplyBtn:hover {
+           
+            background: #0040cc;
+        }
+
+        /* Product Results */
+        .searchResults {
+           
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .searchProductCard {
+            
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            
+            padding: 30px;
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+
+        .searchProductImage {
+            
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .searchProductInfo {
+            
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .searchProductName {
+            
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a1a;
+            max-width: 400px;
+        }
+
+        .searchProductPrice {
+            
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .searchProductAddBtn {
+           
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 32px;
+            border-radius: 4px;
+            border: 1px solid #0156FF;
+            
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0156FF;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .searchProductAddBtn:hover {
+            
+            background: #0156FF;
+            color: #fff;
         }
