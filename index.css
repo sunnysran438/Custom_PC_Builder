@@ -1487,3 +1487,191 @@
         
         background: #0040cc;
     }
+
+  /* ========== SUPPLIER INVENTORY PAGE ONLY ========== */
+  .supplierSection {
+        
+        padding: 40px 80px 60px;
+        background: #fff;
+        min-height: 500px;
+        margin-left: 17%;
+        margin-right: 17%;
+  }
+
+  .supplierSection h1 {
+      
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 30px;
+  }
+
+  .supplierTableHeader {
+      
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 2px solid #eee;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+  }
+
+  .supplierColName {
+      
+    width: 280px;
+      flex-shrink: 0;
+  }
+
+  .supplierColSold {
+      
+    width: 120px;
+      flex-shrink: 0;
+  }
+
+  .supplierColLists {
+      
+    width: 120px;
+      flex-shrink: 0;
+  }
+
+  .supplierColPrice {
+      
+    width: 130px;
+      flex-shrink: 0;
+  }
+
+  .supplierColAvail {
+      
+    width: 140px;
+      flex-shrink: 0;
+  }
+
+  .supplierColActions {
+      
+    width: 100px;
+      flex-shrink: 0;
+      text-align: right;
+  }
+
+  .supplierRow {
+      
+    display: flex;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+  }
+
+  .supplierRow .supplierColName {
+      
+    font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+  }
+
+  .supplierRow .supplierColSold {
+      
+    font-size: 14px;
+      color: #1a1a1a;
+  }
+
+  .supplierRow .supplierColLists {
+      
+    font-size: 14px;
+      color: #1a1a1a;
+  }
+
+  .supplierRow .supplierColPrice {
+     
+    font-size: 14px;
+      font-weight: 700;
+      color: #00b34a;
+  }
+
+  .supplierRow .supplierColAvail {
+      
+    font-size: 14px;
+      color: #1a1a1a;
+  }
+
+  .supplierBtnEdit {
+      
+    display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 36px;
+      border-radius: 6px;
+      border: none;
+      
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: #0156FF;
+      transition: background 0.2s;
+  }
+
+  .supplierBtnEdit:hover {
+      
+    background: #0040cc;
+  }
+
+  .supplierBtnDone {
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 36px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: #00b34a;
+      transition: background 0.2s;
+  }
+
+  .supplierBtnDone:hover {
+      background: #009a3e;
+  }
+
+  .supplierEditInput {
+      width: 90px;
+      height: 32px;
+      padding: 0 8px;
+      
+      border: 1px solid #d0d5e0;
+      border-radius: 4px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      color: #333;
+      outline: none;
+  }
+
+  .supplierEditInput:focus {
+      
+    border-color: #0156FF;
+  }
+
+  .supplierEditSelect {
+     
+       width: 120px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid #d0d5e0;
+      
+      border-radius: 4px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      color: #333;
+      outline: none;
+  }
+
+  .supplierEditSelect:focus {
+      border-color: #0156FF;
+  }
