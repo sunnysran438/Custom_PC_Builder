@@ -1,0 +1,40 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - PC Component Builder{% endblock %}
+
+{% block content %}
+ 
+
+
+
+  <!-- Login Section -->
+    <section class="loginSection">
+        
+        <div class="loginCard">
+        <h1>Customer Login</h1>
+ 
+        <div class="formGroup">
+            <label>Username or Email</label>
+            <input type="text">
+        </div>
+ 
+        <div class="formGroup">
+            <label>Password</label>
+            <input type="password">
+            <a href="#" class="forgotLink">Forgot Your Password?</a>
+        </div>
+ 
+        <div class="loginButtons">
+            <a href="{% url 'home' %}"><button class="btnSignin">Sign In</button></a>
+            
+            <a href="{% url 'register' %}"><button  class="btnSignup">Sign Up</button></a>
+      
+        </div>
+    </div>
+  
+    </section>
+  
+
+    {% endblock %}
