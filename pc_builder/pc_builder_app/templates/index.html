@@ -4,159 +4,120 @@
 {% block title %}Home - PC Component Builder{% endblock %}
 
 {% block content %}
- 
-  <!-- Banner-->
-  <section class="banner">
-    
-    <h1>Search PC Component Database</h1>
-    
-    <form class="bannerSearch" onsubmit="return false;">
-      
-        <input type="text" placeholder="Search">
-      <a href="search_page.html"><button type="submit">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-        </svg>
-        Search
-      </button></a>
-    
-    </form>
-  </section>
- 
-  <!-- Features Section -->
-  <section class="features">
-   
-    <div class="featureItem">
-      
-        <div class="featureIcon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10h5v-2h-5c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8v1.43c0 .79-.71 1.57-1.5 1.57s-1.5-.78-1.5-1.57V12c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5c1.38 0 2.64-.56 3.54-1.47.65.89 1.77 1.47 2.96 1.47 1.97 0 3.5-1.6 3.5-3.57V12c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
-        </div>
-     
-        <h3>Product Support</h3>
-      <p>Up to 3 years on-site warranty available for your peace of mind.</p>
-    
-    </div>
-    
-    <div class="featureItem">
-      
-        <div class="featureIcon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/></svg>
-        </div>
-      
-      <h3>Personal Account</h3>
-      <p>With big discounts, free delivery and a dedicated support specialist.</p>
-    
-    </div>
-    
-    <div class="featureItem">
-      <div class="featureIcon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
-      </div>
-      <h3>Amazing Savings</h3>
-      <p>Up to 70% off new Products, you can be sure of the best price.</p>
-    </div>
-  
-</section>
- 
-  <!-- Build Your Own PC -->
+<section class="banner">
+  <h1>Search PC Component Database</h1>
 
-  <section class="buildBanner">
-    
-    <div class="buildBanneContent">
-      <h2>Build your Own PC</h2>
-      <a href="{% url 'builder' %}">Start Your Build</a>
-    </div>
-    <img class="BuildBannerImage" src="{% static 'images/builder_background.jpg' %}" alt="PC Build">
- 
+  <form class="bannerSearch" action="{% url 'search' %}" method="get">
+    <input type="text" name="q" placeholder="Search">
+    <button type="submit">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+      Search
+    </button>
+  </form>
 </section>
 
-
- 
- 
-  <!-- Completed Builds -->
-  <section class="completedBuilds">
-   
-    <h2>Completed Builds</h2>
-    
-    <div class="buildsCarousel">
-      <button class="carouselArrow">◀</button>
-      <div class="buildsGrid">
- 
-        <!-- Card 1 -->
-        <div class="buildCard">
-         
-            <img class="buildCardImage" src="{% static 'images/pc1.jpeg' %}"> 
-          
-            <div class="buildCardBody">
-            
-            <div class="buildCardUser">
-              <img src="{% static 'images/images/pf3.png' %}" alt="Avatar"> 
-              <span>fredzis1997</span>
-            </div>
-            <h3>Best Budget PC</h3>
-            <p class="specs">Intel Core i7-12700K<br>GeForce RTX 3090 Ti</p>
-          
-        </div>
-          
-          <div class="buildCardFooter">
-            <span class="price">$2002.26+</span>
-            <div class="stats">
-              <span>↑ 69</span>
-              <span>💬 23</span>
-            </div>
-          
-        </div>
-        </div>
- 
-        <!-- Card 2 -->
-        <div class="buildCard">
-          <img class="buildCardImage" src="{% static 'images/pc2.jpeg' %}" > 
-          
-          <div class="buildCardBody">
-            <div class="buildCardUser">
-              <img src="{% static 'images/pf2.png' %}" alt="Avatar"> 
-              <span>stefanss</span>
-            </div>
-            <h3>Blackout Protocol — Low Noise. High Airflow. Zero RGB</h3>
-            <p class="specs">AMD Ryzen 9 9950X (@5.7 GHz)<br>GeForce RTX 5070 Ti</p>
-          </div>
-         
-          <div class="buildCardFooter">
-            <span class="price">$4745.10</span>
-            <div class="stats">
-              <span>↑ 5</span>
-              <span>💬 1</span>
-            </div>
-          </div>
-        
-        </div>
- 
-        <!-- Card 3 -->
-        <div class="buildCard">
-          
-            <img class="buildCardImage" src="{% static 'images/pc3.jpeg' %}" alt="Complete dream build">
-            <div class="buildCardBody">
-            <div class="buildCardUser">
-              <img src="{% static 'images/pc3.png' %}" alt="Avatar">
-              <span>SS996SKU</span>
-            </div>
-            <h3>Complete dream build (for now)</h3>
-            <p class="specs">AMD Ryzen 9 9950X3D (@5.6 GHz)</p>
-            </div>
-          
-            <div class="buildCardFooter">
-            <span class="price">$2769.97+</span>
-            <div class="stats">
-              <span>↑ 13</span>
-              <span>💬 10</span>
-            
-            </div>
-          </div>
-        </div>
- 
-      </div>
-      <button class="carouselArrow">▶</button>
+<section class="features">
+  <div class="featureItem">
+    <div class="featureIcon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10h5v-2h-5c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8v1.43c0 .79-.71 1.57-1.5 1.57s-1.5-.78-1.5-1.57V12c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5c1.38 0 2.64-.56 3.54-1.47.65.89 1.77 1.47 2.96 1.47 1.97 0 3.5-1.6 3.5-3.57V12c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
     </div>
-  </section>
- 
+    <h3>Product Support</h3>
+    <p>Up to 3 years on-site warranty available for your peace of mind.</p>
+  </div>
+
+  <div class="featureItem">
+    <div class="featureIcon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/></svg>
+    </div>
+    <h3>Personal Account</h3>
+    <p>With big discounts, free delivery and a dedicated support specialist.</p>
+  </div>
+
+  <div class="featureItem">
+    <div class="featureIcon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+    </div>
+    <h3>Amazing Savings</h3>
+    <p>Up to 70% off new Products, you can be sure of the best price.</p>
+  </div>
+</section>
+
+<section class="buildBanner">
+  <div class="buildBanneContent">
+    <h2>Build your Own PC</h2>
+    <a href="{% url 'builder' %}">Start Your Build</a>
+  </div>
+  <img class="BuildBannerImage" src="{% static 'images/builder_background.jpg' %}" alt="PC Build">
+</section>
+
+<section class="completedBuilds">
+  <h2>Completed Builds</h2>
+
+  <div class="buildsCarousel">
+    <button class="carouselArrow" type="button">◀</button>
+    <div class="buildsGrid">
+
+      <div class="buildCard">
+        <img class="buildCardImage" src="{% static 'images/pc1.jpeg' %}" alt="Budget PC">
+        <div class="buildCardBody">
+          <div class="buildCardUser">
+            <img src="{% static 'images/pf3.png' %}" alt="Avatar">
+            <span>fredzis1997</span>
+          </div>
+          <h3>Best Budget PC</h3>
+          <p class="specs">Intel Core i7-12700K<br>GeForce RTX 3090 Ti</p>
+        </div>
+        <div class="buildCardFooter">
+          <span class="price">$2002.26+</span>
+          <div class="stats">
+            <span>↑ 69</span>
+            <span>💬 23</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="buildCard">
+        <img class="buildCardImage" src="{% static 'images/pc2.jpeg' %}" alt="Blackout Protocol">
+        <div class="buildCardBody">
+          <div class="buildCardUser">
+            <img src="{% static 'images/pf2.png' %}" alt="Avatar">
+            <span>stefanss</span>
+          </div>
+          <h3>Blackout Protocol — Low Noise. High Airflow. Zero RGB</h3>
+          <p class="specs">AMD Ryzen 9 9950X (@5.7 GHz)<br>GeForce RTX 5070 Ti</p>
+        </div>
+        <div class="buildCardFooter">
+          <span class="price">$4745.10</span>
+          <div class="stats">
+            <span>↑ 5</span>
+            <span>💬 1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="buildCard">
+        <img class="buildCardImage" src="{% static 'images/pc3.jpeg' %}" alt="Complete dream build">
+        <div class="buildCardBody">
+          <div class="buildCardUser">
+            <img src="{% static 'images/pc3.png' %}" alt="Avatar">
+            <span>SS996SKU</span>
+          </div>
+          <h3>Complete dream build (for now)</h3>
+          <p class="specs">AMD Ryzen 9 9950X3D (@5.6 GHz)</p>
+        </div>
+        <div class="buildCardFooter">
+          <span class="price">$2769.97+</span>
+          <div class="stats">
+            <span>↑ 13</span>
+            <span>💬 10</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <button class="carouselArrow" type="button">▶</button>
+  </div>
+</section>
 {% endblock %}

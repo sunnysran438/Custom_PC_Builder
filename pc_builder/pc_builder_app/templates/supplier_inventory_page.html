@@ -1,205 +1,122 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Builder - PC Component Builder{% endblock %}
+{% block title %}Supplier Inventory - PC Component Builder{% endblock %}
 
 {% block content %}
-    <!-- Supplier Inventory Section -->
-  <section class="supplierSection">
-    <h1>Supplier Inventory</h1>
- 
-    <!-- Table Header -->
-    
-    <div class="supplierTableHeader">
-      
-      <div class="supplierColName">Component Name</div>
-      <div class="supplierColSold">Units Sold</div>
-      <div class="supplierColLists">Build Lists</div>
-      <div class="supplierColPrice">Price</div>
-      <div class="supplierColAvail">Availability</div>
-      <div class="supplierColActions"></div>
-    
-    </div>
- 
-    <!-- Row 1 -->
-   
-    <div class="supplierRow" data-id="1">
-     
+<section class="supplierSection">
+  <h1>Supplier Inventory</h1>
+
+  <div class="supplierTableHeader">
+    <div class="supplierColName">Component Name</div>
+    <div class="supplierColSold">Units Sold</div>
+    <div class="supplierColLists">Build Lists</div>
+    <div class="supplierColPrice">Price</div>
+    <div class="supplierColAvail">Availability</div>
+    <div class="supplierColActions"></div>
+  </div>
+
+  <div class="supplierRow" data-id="1">
     <div class="supplierColName">AMD Ryzen 7 5800X</div>
-      
     <div class="supplierColSold" data-field="units_sold">5</div>
-      <div class="supplierColLists">1</div>
-      <div class="supplierColPrice" data-field="price">425.71</div>
-      <div class="supplierColAvail" data-field="availability">In stock</div>
-      <div class="supplierColActions">
-      <button class="supplierBtnEdit">Edit</button>
-      </div>
-    
+    <div class="supplierColLists">1</div>
+    <div class="supplierColPrice" data-field="price">425.71</div>
+    <div class="supplierColAvail" data-field="availability">In stock</div>
+    <div class="supplierColActions">
+      <button type="button" class="supplierBtnEdit">Edit</button>
     </div>
- 
-    <!-- Row 2 -->
-    
-    <div class="supplierRow" data-id="2">
-      
+  </div>
+
+  <div class="supplierRow" data-id="2">
     <div class="supplierColName">AMD Ryzen 5 5500 6-Core</div>
-      <div class="supplierColSold" data-field="units_sold">3</div>
-      <div class="supplierColLists">2</div>
-      <div class="supplierColPrice" data-field="price">284.28</div>
-      <div class="supplierColAvail" data-field="availability">In stock</div>
-      <div class="supplierColActions">
-      <button class="supplierBtnEdit">Edit</button>
-      </div>
-    
+    <div class="supplierColSold" data-field="units_sold">3</div>
+    <div class="supplierColLists">2</div>
+    <div class="supplierColPrice" data-field="price">284.28</div>
+    <div class="supplierColAvail" data-field="availability">In stock</div>
+    <div class="supplierColActions">
+      <button type="button" class="supplierBtnEdit">Edit</button>
     </div>
- 
-    <!-- Row 3 -->
-    
-    <div class="supplierRow" data-id="3">
-      
-      <div class="supplierColName">AMD Ryzen 5 9600X 6-Core</div>
-      <div class="supplierColSold" data-field="units_sold">43</div>
-      <div class="supplierColLists">3</div>
-      <div class="supplierColPrice" data-field="price">259.99</div>
-      <div class="supplierColAvail" data-field="availability">In stock</div>
-      <div class="supplierColActions">
-      <button class="supplierBtnEdit">Edit</button>
-     
-    </div>
-    </div>
- 
-    <!-- Row 4 -->
-    
-    <div class="supplierRow" data-id="4">
-     
-        <div class="supplierColName">AMD Ryzen 7 9700X 8-Core</div>
-      <div class="supplierColSold" data-field="units_sold">16</div>
-      <div class="supplierColLists">4</div>
-      <div class="supplierColPrice" data-field="price">430.00</div>
-      <div class="supplierColAvail" data-field="availability">out of stock</div>
-      <div class="supplierColActions">
-    <button class="supplierBtnEdit">Edit</button>
-      
-    </div>
-    </div>
- 
-  </section>
+  </div>
 
+  <div class="supplierRow" data-id="3">
+    <div class="supplierColName">AMD Ryzen 5 9600X 6-Core</div>
+    <div class="supplierColSold" data-field="units_sold">43</div>
+    <div class="supplierColLists">3</div>
+    <div class="supplierColPrice" data-field="price">259.99</div>
+    <div class="supplierColAvail" data-field="availability">In stock</div>
+    <div class="supplierColActions">
+      <button type="button" class="supplierBtnEdit">Edit</button>
+    </div>
+  </div>
+
+  <div class="supplierRow" data-id="4">
+    <div class="supplierColName">AMD Ryzen 7 9700X 8-Core</div>
+    <div class="supplierColSold" data-field="units_sold">16</div>
+    <div class="supplierColLists">4</div>
+    <div class="supplierColPrice" data-field="price">430.00</div>
+    <div class="supplierColAvail" data-field="availability">out of stock</div>
+    <div class="supplierColActions">
+      <button type="button" class="supplierBtnEdit">Edit</button>
+    </div>
+  </div>
+</section>
 {% endblock %}
-
-
-
-
-
-
-
 
 {% block scripts %}
 <script>
-    var editButtons = document.querySelectorAll('.supplierBtnEdit');
- 
-    for (var i = 0; i < editButtons.length; i++) {
-      editButtons[i].addEventListener('click', handleEditClick);
+  document.addEventListener('click', function (e) {
+    if (!e.target.classList.contains('supplierBtnEdit') && !e.target.classList.contains('supplierBtnDone')) {
+      return;
     }
- 
-    function handleEditClick(e) {
-      var btn = e.target;
-      var row = btn.closest('.supplierRow');
- 
-      if (btn.textContent === 'Edit') {
-        // Switch to edit mode
-        var soldCell = row.querySelector('[data-field="units_sold"]');
-        var priceCell = row.querySelector('[data-field="price"]');
-        var availCell = row.querySelector('[data-field="availability"]');
- 
-        // Store original values
-        var soldVal = soldCell.textContent.trim();
-        var priceVal = priceCell.textContent.trim();
-        var availVal = availCell.textContent.trim();
- 
-        // Replace with inputs
-        soldCell.innerHTML = '<input type="number" class="supplierEditInput" value="' + soldVal + '">';
-        priceCell.innerHTML = '<input type="number" step="0.01" class="supplierEditInput" value="' + priceVal + '">';
- 
-        var selectHTML = '<select class="supplierEditSelect">';
-        selectHTML += '<option value="In stock"' + (availVal === 'In stock' ? ' selected' : '') + '>In stock</option>';
-        selectHTML += '<option value="out of stock"' + (availVal === 'out of stock' ? ' selected' : '') + '>out of stock</option>';
-        selectHTML += '</select>';
-        availCell.innerHTML = selectHTML;
- 
-        // Change button to Done
-        btn.textContent = 'Done';
-        btn.classList.remove('supplierBtnEdit');
-        btn.classList.add('supplierBtnDone');
-      }
-      
-      else if (btn.textContent === 'Done') {
-        // Switch back to display mode
-        var soldInput = row.querySelector('[data-field="units_sold"] input');
-        var priceInput = row.querySelector('[data-field="price"] input');
-        var availSelect = row.querySelector('[data-field="availability"] select');
- 
-        var newSold = soldInput.value;
-        var newPrice = priceInput.value;
-        var newAvail = availSelect.value;
- 
-        // Update the cells with new values
-        row.querySelector('[data-field="units_sold"]').textContent = newSold;
-        row.querySelector('[data-field="price"]').textContent = parseFloat(newPrice).toFixed(2);
-        row.querySelector('[data-field="availability"]').textContent = newAvail;
- 
-        // Change button back to Edit
-        btn.textContent = 'Edit';
-        btn.classList.remove('supplierBtnDone');
-        btn.classList.add('supplierBtnEdit');
- 
-        // Send updated data to Django backend
-        var rowId = row.getAttribute('data-id');
-        var updatedData = {
-          id: rowId,
-          units_sold: newSold,
-          price: newPrice,
-          availability: newAvail
-        };
- 
-        // Django backend call (uncomment when backend is ready)
-        /*
-        fetch('/api/supplier/update/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-          },
-          body: JSON.stringify(updatedData)
-        })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          console.log('Updated:', data);
-        })
-        .catch(function (error) {
-          console.error('Error:', error);
-        });
-        */
- 
-        console.log('Data to send to backend:', updatedData);
-      }
+
+    const btn = e.target;
+    const row = btn.closest('.supplierRow');
+
+    if (btn.textContent === 'Edit') {
+      const soldCell = row.querySelector('[data-field="units_sold"]');
+      const priceCell = row.querySelector('[data-field="price"]');
+      const availCell = row.querySelector('[data-field="availability"]');
+
+      const soldVal = soldCell.textContent.trim();
+      const priceVal = priceCell.textContent.trim();
+      const availVal = availCell.textContent.trim();
+
+      soldCell.innerHTML = '<input type="number" class="supplierEditInput" value="' + soldVal + '">';
+      priceCell.innerHTML = '<input type="number" step="0.01" class="supplierEditInput" value="' + priceVal + '">';
+
+      let selectHTML = '<select class="supplierEditSelect">';
+      selectHTML += '<option value="In stock"' + (availVal === 'In stock' ? ' selected' : '') + '>In stock</option>';
+      selectHTML += '<option value="out of stock"' + (availVal === 'out of stock' ? ' selected' : '') + '>out of stock</option>';
+      selectHTML += '</select>';
+      availCell.innerHTML = selectHTML;
+
+      btn.textContent = 'Done';
+      btn.classList.remove('supplierBtnEdit');
+      btn.classList.add('supplierBtnDone');
+    } else {
+      const soldInput = row.querySelector('[data-field="units_sold"] input');
+      const priceInput = row.querySelector('[data-field="price"] input');
+      const availSelect = row.querySelector('[data-field="availability"] select');
+
+      const newSold = soldInput.value;
+      const newPrice = priceInput.value;
+      const newAvail = availSelect.value;
+
+      row.querySelector('[data-field="units_sold"]').textContent = newSold;
+      row.querySelector('[data-field="price"]').textContent = parseFloat(newPrice || 0).toFixed(2);
+      row.querySelector('[data-field="availability"]').textContent = newAvail;
+
+      btn.textContent = 'Edit';
+      btn.classList.remove('supplierBtnDone');
+      btn.classList.add('supplierBtnEdit');
+
+      console.log('Data to send to backend:', {
+        id: row.getAttribute('data-id'),
+        units_sold: newSold,
+        price: newPrice,
+        availability: newAvail
+      });
     }
- 
-    // Helper to get Django CSRF token from cookies (needed for POST requests)
-    function getCookie(name) {
-      var cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-          var cookie = cookies[i].trim();
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
-        }
-      }
-      return cookieValue;
-    }
-  </script>
+  });
+</script>
 {% endblock %}

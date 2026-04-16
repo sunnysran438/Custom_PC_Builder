@@ -21,6 +21,11 @@ def builder(request):
     return render(request, "builder.html", {"items": items})
 
 
+def search(request):
+    components = Component.objects.all()
+    return render(request, "search_page.html", {"components": components})
+
+
 def add_component(request, component_id):
     build = Build.objects.get(id=1)
     component = Component.objects.get(id=component_id)
@@ -32,11 +37,6 @@ def add_component(request, component_id):
 def remove_component(request, item_id):
     BuildItem.objects.filter(id=item_id).delete()
     return redirect("builder")
-
-
-def search(request):
-    components = Component.objects.all()
-    return render(request, "search_page.html", {"components": components})
 
 
 def supplier_inventory(request):

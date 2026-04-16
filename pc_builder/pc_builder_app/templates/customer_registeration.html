@@ -4,85 +4,60 @@
 {% block title %}Register - PC Component Builder{% endblock %}
 
 {% block content %}
-
-
-  <!-- Registration Section -->
-  <section class="registerSection">
-
-    <div class="registrationCard">
-    
+<section class="registerSection">
+  <div class="registrationCard">
     <h1>Customer Registration</h1>
- 
-    <div class="regFormGroup">
-      
-      <label>Email Address</label>
-      <input type="email">
-    
-    </div>
- 
-    <div class="regFormGroup">
-      
-    <label>First Name</label>
-      <input type="text">
-    
-    </div>
- 
-    <div class="regFormGroup">
-      
-      <label>Last Name</label>
-      <input type="text">
-    
-    </div>
- 
-    <div class="regFormGroup">
-     
-    <label>Street Address</label>
-      <input type="text">
-    
-    </div>
- 
-    <div class="regFormGroup">
-      
-    <label>City</label>
-      <input type="text">
-    
-    </div>
- 
-    
-    <div class="regFormGroup">
-      
-      <label>State/Province</label>
-      <input type="text">
-   
-    </div>
- 
-    
-    <div class="regFormGroup">
-      
-      <label>Zip/Postal Code</label>
-      <input type="text">
-    
-    </div>
- 
-    
-    <div class="regFormGroup">
-     
-    <label>Country</label>
-     <input type="text">
-    
-    </div>
- 
-    
-    <div class="regFormGroup">
-     
-      <label>Phone Number</label>
-      <input type="tel">
-  
-    </div>
- 
-    <a href="{% url 'login' %}"><button class="regBtnSignup">Sign Up</button></a>
-  
- 
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="regFormGroup">
+        <label for="reg-email">Email Address</label>
+        <input id="reg-email" type="email" name="email">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-first-name">First Name</label>
+        <input id="reg-first-name" type="text" name="first_name">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-last-name">Last Name</label>
+        <input id="reg-last-name" type="text" name="last_name">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-street">Street Address</label>
+        <input id="reg-street" type="text" name="street">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-city">City</label>
+        <input id="reg-city" type="text" name="city">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-province">State/Province</label>
+        <input id="reg-province" type="text" name="province">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-postal">Zip/Postal Code</label>
+        <input id="reg-postal" type="text" name="postal_code">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-country">Country</label>
+        <input id="reg-country" type="text" name="country">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-phone">Phone Number</label>
+        <input id="reg-phone" type="tel" name="phone">
+      </div>
+
+      <button type="submit" class="regBtnSignup">Sign Up</button>
+    </form>
+  </div>
 </section>
- 
 {% endblock %}

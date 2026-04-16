@@ -17,14 +17,13 @@ class Supplier(models.Model):
 
 class Component(models.Model):
     COMPONENT_TYPES = [
-        ("cpu", "CPU"),
-        ("gpu", "GPU"),
-        ("ram", "RAM"),
-        ("storage", "Storage"),
-        ("motherboard", "Motherboard"),
-        ("psu", "Power Supply"),
-        ("case", "Case"),
-        ("cooler", "Cooler"),
+        ("CPU", "CPU"),
+        ("GPU", "GPU"),
+        ("RAM", "RAM"),
+        ("Storage", "Storage"),
+        ("Motherboard", "Motherboard"),
+        ("PSU", "Power Supply"),
+        ("Case", "Case"),
     ]
 
     name = models.CharField(max_length=255)
@@ -32,7 +31,7 @@ class Component(models.Model):
     manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.name} ({self.component_type})"
+        return self.name
 
 
 class StoreItem(models.Model):
@@ -40,18 +39,11 @@ class StoreItem(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     price = models.FloatField()
 
-    def __str__(self):
-        return f"{self.component.name} - {self.supplier.name}"
-
 
 class Build(models.Model):
     name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
 
 
 class BuildItem(models.Model):
     build = models.ForeignKey(Build, on_delete=models.CASCADE)
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
