@@ -1,32 +1,32 @@
 {% extends 'base.html' %}
 {% load static %}
-
+ 
 {% block title %}Manufacturer - PC Component Builder{% endblock %}
-
+ 
 {% block extra_head %}
 <style>
   .mfrFormHidden {
     display: none;
   }
-
+ 
   .mfrFormSection {
     max-width: 900px;
     margin: 40px auto;
     padding: 0 20px;
   }
-
+ 
   .mfrFormGrid {
     display: grid;
     grid-template-columns: repeat(2, minmax(220px, 1fr));
     gap: 16px 24px;
   }
-
+ 
   .mfrFormGroup {
     display: flex;
     flex-direction: column;
     gap: 6px;
   }
-
+ 
   .mfrFormInput,
   .mfrFormSelect {
     padding: 10px 12px;
@@ -35,21 +35,21 @@
     font: inherit;
     background: #fff;
   }
-
+ 
   .mfrAddBtn {
     margin-top: 20px;
   }
 </style>
 {% endblock %}
-
+ 
 {% block content %}
 <section class="loginSection">
   <div class="loginCard">
     <h1 style="text-align:center;">Select component</h1>
-
+ 
     <div class="formGroup">
       <label for="componentSelect">Components</label>
-      <select id="componentSelect" class="mfrFormSelect">
+      <select id="componentSelect" class="mfrFormSelect" >
         <option value="">Select a component</option>
         <option value="cpu">CPU</option>
         <option value="gpu">GPU</option>
@@ -67,190 +67,1201 @@
   </div>
 </section>
 
-<section class="mfrFormSection mfrFormHidden" id="mfrFormSection">
-  <h1 class="mfrFormTitle" id="mfrFormTitle">Component</h1>
+<form method="post" id="mfrForm">
+  {% csrf_token %}
 
-  <div id="mfrSharedFields" class="mfrFormGrid">
-    <div class="mfrFormGroup">
-      <label>Product Name</label>
-      <input type="text" class="mfrFormInput" placeholder="Enter product name">
-    </div>
-  </div>
-
-  <div id="mfrFieldsCpu" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup"><label>Socket Type</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Number of Cores</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Number of Threads</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Base Clock</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Boost Clock</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>L2 Cache</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>L3 Cache</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>TDP</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Architecture</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Chip Family</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Series</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsGpu" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup"><label>Interface</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Series</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Architecture</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Base Clock</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Boost Clock</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Memory Size</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Memory Type</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>PCIe Version</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Power Consumption</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Pins</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsMotherboard" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup"><label>CPU Socket Type</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Chipset Name</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>RAM Type</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>RAM Slots</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>USB Ports</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Form Factor</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Max SATA Connections</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Fan Headers</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Has Ethernet Controller</label><select class="mfrFormSelect"><option>Select option</option><option>Yes</option><option>No</option></select></div>
-      <div class="mfrFormGroup"><label>CPU Cooler Header</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>PCI Slots</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Max PSU Length</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsRam" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup"><label>Capacity</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Base Frequency</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>RAM Type</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsStorage" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup">
-        <label>Storage Type</label>
-        <select class="mfrFormSelect" id="mfrStorageType">
-          <option>Select option</option>
-          <option value="m2">M.2 Storage</option>
-          <option value="sata">SATA SSD Storage</option>
-        </select>
-      </div>
-      <div class="mfrFormGroup"><label>Capacity</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Read Speed</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Write Speed</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Interface</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Form Factor</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsPsu" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup"><label>Type</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Power Rating</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Connection</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Modular</label><select class="mfrFormSelect"><option>Select option</option><option>Full</option><option>Semi</option><option>Non-Modular</option></select></div>
-      <div class="mfrFormGroup"><label>Length</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>PSU Compatibility</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsCase" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup"><label>Form Factor</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Height</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Width</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Length</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Max GPU Length</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Num 2.5 Drive Bays</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Num 3.5 Drive Bays</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Radiator Support</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Max PSU Length</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>IO Ports</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Color</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Material</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsCpuCooler" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup">
-        <label>Cooler Type</label>
-        <select class="mfrFormSelect" id="mfrCoolerType">
-          <option>Select option</option>
-          <option value="air">Air CPU Cooler</option>
-          <option value="liquid">Liquid CPU Cooler</option>
-        </select>
-      </div>
-      <div class="mfrFormGroup"><label>Fan RPM</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Cooler Height</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Noise Level</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Fan Diameter</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-
-    <div id="mfrFieldsAirCooler" class="mfrFormHidden" style="margin-top:20px;">
-      <div class="mfrFormGrid">
-        <div class="mfrFormGroup"><label>Height</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-        <div class="mfrFormGroup"><label>Width</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      </div>
-    </div>
-
-    <div id="mfrFieldsLiquidCooler" class="mfrFormHidden" style="margin-top:20px;">
-      <div class="mfrFormGrid">
-        <div class="mfrFormGroup"><label>Radiator Size</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-        <div class="mfrFormGroup"><label>Num Fans</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-        <div class="mfrFormGroup"><label>Cooling Tube Length</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsFan" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup"><label>Fan Size</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Fan Diameter</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Fan RPM</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-      <div class="mfrFormGroup"><label>Noise Level</label><select class="mfrFormSelect"><option>Select option</option></select></div>
-    </div>
-  </div>
-
-  <div id="mfrFieldsEthernetController" class="mfrFormHidden">
-    <div class="mfrFormGrid">
+  <section class="mfrFormSection mfrFormHidden" id="mfrFormSection">
+    <h1 class="mfrFormTitle" id="mfrFormTitle">Component</h1>
+  
+    <!-- Shared Fields -->
+    <div id="mfrSharedFields" class="mfrFormGrid">
       <div class="mfrFormGroup">
         <label>Product Name</label>
-        <input type="text" class="mfrFormInput" placeholder="Enter product name">
+        <input type="text" class="mfrFormInput" name="product_name" placeholder="Enter product name" >
       </div>
     </div>
-  </div>
-
-  <div id="mfrFieldsWifiModule" class="mfrFormHidden">
-    <div class="mfrFormGrid">
-      <div class="mfrFormGroup">
-        <label>Product Name</label>
-        <input type="text" class="mfrFormInput" placeholder="Enter product name">
+  
+    <!-- CPU Fields -->
+    <div id="mfrFieldsCpu" class="mfrFormHidden">
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          <label>Chip Family</label>
+          
+          <select class="mfrFormSelect" name="chip_family" >
+            <option value="">Select option</option>
+            <option value="Ryzen">Ryzen</option>
+            <option value="Threadripper">Threadripper</option>
+            <option value="EPYC">EPYC</option>
+            <option value="Athlon">Athlon</option>
+            <option value="Core">Core</option>
+            <option value="Core Ultra">Core Ultra</option>
+            <option value="Xeon">Xeon</option>
+            <option value="Pentium">Pentium</option>
+            <option value="Celeron">Celeron</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Series</label>
+          <select class="mfrFormSelect" name="series" >
+            
+            <option value="">Select option</option>
+            <option value="3 1000">3 1000</option>
+            <option value="5 1000">5 1000</option>
+            <option value="7 1000">7 1000</option>
+            <option value="9 1000">9 1000</option>
+            <option value="3 3000">3 3000</option>
+            <option value="5 3000">5 3000</option>
+            <option value="7 3000">7 3000</option>
+            <option value="9 3000">9 3000</option>
+            <option value="3 5000">3 5000</option>
+            <option value="5 5000">5 5000</option>
+            <option value="7 5000">7 5000</option>
+            <option value="9 5000">9 5000</option>
+            <option value="5 7000">5 7000</option>
+            <option value="7 7000">7 7000</option>
+            <option value="9 7000">9 7000</option>
+            <option value="5 9000">5 9000</option>
+            <option value="7 9000">7 9000</option>
+            <option value="9 9000">9 9000</option>
+            <option value="i3 12th Gen">i3 12th Gen</option>
+            <option value="i5 12th Gen">i5 12th Gen</option>
+            <option value="i7 12th Gen">i7 12th Gen</option>
+            <option value="i9 12th Gen">i9 12th Gen</option>
+            <option value="i3 13th Gen">i3 13th Gen</option>
+            <option value="i5 13th Gen">i5 13th Gen</option>
+            <option value="i7 13th Gen">i7 13th Gen</option>
+            <option value="i9 13th Gen">i9 13th Gen</option>
+            <option value="i3 14th Gen">i3 14th Gen</option>
+            <option value="i5 14th Gen">i5 14th Gen</option>
+            <option value="i7 14th Gen">i7 14th Gen</option>
+            <option value="i9 14th Gen">i9 14th Gen</option>
+            <option value="Ultra 5">Ultra 5</option>
+            <option value="Ultra 7">Ultra 7</option>
+            <option value="Ultra 9">Ultra 9</option>
+         
+          </select>
+        
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>TDP (Watts)</label>
+          <select class="mfrFormSelect" name="tdp" >
+            <option value="">Select option</option>
+            <option value="35">35W</option>
+            <option value="45">45W</option>
+            <option value="65">65W</option>
+            <option value="95">95W</option>
+            <option value="105">105W</option>
+            <option value="125">125W</option>
+            <option value="150">150W</option>
+            <option value="170">170W</option>
+            <option value="200">200W</option>
+            <option value="250">250W</option>
+            <option value="280">280W</option>
+            <option value="350">350W</option>
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+          <label>Base Clock (MHz)</label>
+          <select class="mfrFormSelect" name="base_clock" >
+            <option value="">Select option</option>
+            <option value="2000">2000</option>
+            <option value="2500">2500</option>
+            <option value="2800">2800</option>
+            <option value="3000">3000</option>
+            <option value="3200">3200</option>
+            <option value="3400">3400</option>
+            <option value="3500">3500</option>
+            <option value="3600">3600</option>
+            <option value="3700">3700</option>
+            <option value="3800">3800</option>
+            <option value="4000">4000</option>
+            <option value="4200">4200</option>
+            <option value="4300">4300</option>
+            <option value="4500">4500</option>
+            <option value="4700">4700</option>
+            <option value="5000">5000</option>
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+          <label>Boost Clock (MHz)</label>
+          <select class="mfrFormSelect" name="boost_clock" >
+          
+            <option value="">Select option</option>
+            <option value="4000">4000</option>
+            <option value="4200">4200</option>
+            <option value="4400">4400</option>
+            <option value="4600">4600</option>
+            <option value="4800">4800</option>
+            <option value="4900">4900</option>
+            <option value="5000">5000</option>
+            <option value="5100">5100</option>
+            <option value="5200">5200</option>
+            <option value="5400">5400</option>
+            <option value="5500">5500</option>
+            <option value="5600">5600</option>
+            <option value="5700">5700</option>
+            <option value="5800">5800</option>
+            <option value="6000">6000</option>
+            <option value="6200">6200</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+        
+          <label>L1 Cache (KB)</label>
+          <select class="mfrFormSelect" name="l1_cache" >
+            <option value="">Select option</option>
+            <option value="384">384</option>
+            <option value="512">512</option>
+            <option value="640">640</option>
+            <option value="768">768</option>
+            <option value="1024">1024</option>
+            <option value="1280">1280</option>
+            <option value="2048">2048</option>
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+          <label>L2 Cache (MB)</label>
+          <select class="mfrFormSelect" name="l2_cache" >
+            <option value="">Select option</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="12">12</option>
+            <option value="16">16</option>
+            <option value="24">24</option>
+            <option value="32">32</option>
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+        
+          <label>L3 Cache (MB)</label>
+          <select class="mfrFormSelect" name="l3_cache" >
+            <option value="">Select option</option>
+            <option value="8">8</option>
+            <option value="16">16</option>
+            <option value="24">24</option>
+            <option value="32">32</option>
+            <option value="64">64</option>
+            <option value="96">96</option>
+            <option value="128">128</option>
+            <option value="256">256</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Number of Cores</label>
+          <select class="mfrFormSelect" name="num_cores" >
+            <option value="">Select option</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+            <option value="24">24</option>
+            <option value="32">32</option>
+            <option value="64">64</option>
+            <option value="96">96</option>
+            <option value="128">128</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Number of Threads</label>
+        
+          <select class="mfrFormSelect" name="num_threads" >
+          
+            <option value="">Select option</option>
+            <option value="4">4</option>
+            <option value="8">8</option>
+            <option value="12">12</option>
+            <option value="16">16</option>
+            <option value="20">20</option>
+            <option value="24">24</option>
+            <option value="28">28</option>
+            <option value="32">32</option>
+            <option value="48">48</option>
+            <option value="64">64</option>
+            <option value="128">128</option>
+            <option value="192">192</option>
+            <option value="256">256</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Architecture</label>
+          <select class="mfrFormSelect" name="architecture" >
+            <option value="">Select option</option>
+            <option value="Zen-2">Zen 2</option>
+            <option value="Zen-3">Zen 3</option>
+            <option value="Zen-4">Zen 4</option>
+            <option value="Zen-5">Zen 5</option>
+            <option value="Alder Lake">Alder Lake</option>
+            <option value="Raptor Lake">Raptor Lake</option>
+            <option value="Meteor Lake">Meteor Lake</option>
+            <option value="Arrow Lake">Arrow Lake</option>
+            <option value="Lunar Lake">Lunar Lake</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Socket Type</label>
+          <select class="mfrFormSelect" name="socket_type" >
+            <option value="">Select option</option>
+            <option value="Socket AM4">Socket AM4</option>
+            <option value="Socket AM5">Socket AM5</option>
+            <option value="Socket sTR5">Socket sTR5</option>
+            <option value="Socket sTRX4">Socket sTRX4</option>
+            <option value="Socket SP5">Socket SP5</option>
+            <option value="LGA 1151">LGA 1151</option>
+            <option value="LGA 1200">LGA 1200</option>
+            <option value="LGA 1700">LGA 1700</option>
+            <option value="LGA 1851">LGA 1851</option>
+            <option value="LGA 2066">LGA 2066</option>
+            <option value="LGA 4677">LGA 4677</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+        
+          <label>RAM Type</label>
+          <select class="mfrFormSelect" name="ram_type" >
+            
+            <option value="">Select option</option>
+            <option value="4">DDR4</option>
+            <option value="5">DDR5</option>
+          
+          </select>
+        
+        </div>
       </div>
     </div>
-  </div>
+  
+    <!-- GPU Fields -->
+    <div id="mfrFieldsGpu" class="mfrFormHidden">
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          <label>Series</label>
+          
+          <select class="mfrFormSelect" name="series" >
+            
+            <option value="">Select option</option>
+            <option value="RTX 5000">RTX 5000</option>
+            <option value="RTX 4000">RTX 4000</option>
+            <option value="RTX 3000">RTX 3000</option>
+            <option value="RTX 2000">RTX 2000</option>
+            <option value="GTX 1600">GTX 1600</option>
+            <option value="RX 9000">RX 9000</option>
+            <option value="RX 7000">RX 7000</option>
+            <option value="RX 6000">RX 6000</option>
+            <option value="Arc A-Series">Arc A-Series</option>
+            <option value="Arc B-Series">Arc B-Series</option>
+        
+          </select>
+        
+        </div>
+        <div class="mfrFormGroup">
+          <label>Architecture</label>
+          
+          <select class="mfrFormSelect" name="architecture" >
+            
+            <option value="">Select option</option>
+            <option value="Blackwell">Blackwell</option>
+            <option value="Ada Lovelace">Ada Lovelace</option>
+            <option value="Ampere">Ampere</option>
+            <option value="Turing">Turing</option>
+            <option value="RDNA 4">RDNA 4</option>
+            <option value="RDNA 3">RDNA 3</option>
+            <option value="RDNA 2">RDNA 2</option>
+            <option value="Battlemage">Battlemage</option>
+            <option value="Alchemist">Alchemist</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Base Clock (MHz)</label>
+          
+          <select class="mfrFormSelect" name="base_clock" >
+            
+            <option value="">Select option</option>
+            <option value="1500">1500</option>
+            <option value="1700">1700</option>
+            <option value="1800">1800</option>
+            <option value="2000">2000</option>
+            <option value="2200">2200</option>
+            <option value="2300">2300</option>
+            <option value="2500">2500</option>
+            <option value="2530">2530</option>
+        
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+          <label>Boost Clock (MHz)</label>
+          
+          <select class="mfrFormSelect" name="boost_clock" >
+            
+            <option value="">Select option</option>
+            <option value="1800">1800</option>
+            <option value="2000">2000</option>
+            <option value="2200">2200</option>
+            <option value="2400">2400</option>
+            <option value="2500">2500</option>
+            <option value="2600">2600</option>
+            <option value="2800">2800</option>
+            <option value="3000">3000</option>
+            <option value="3130">3130</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Memory Size (GB)</label>
+          
+          <select class="mfrFormSelect" name="memory_size" >
+            
+            <option value="">Select option</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="12">12</option>
+            <option value="16">16</option>
+            <option value="24">24</option>
+            <option value="32">32</option>
+            <option value="48">48</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Memory Type</label>
+          <select class="mfrFormSelect" name="memory_type" >
+            
+          <option value="">Select option</option>
+          <option value="6">GDDR6</option>
+          <option value="7">GDDR6X</option>
+          <option value="8">GDDR7</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Number of Cores</label>
+          <select class="mfrFormSelect" name="num_cores" >
+          
+            <option value="">Select option</option>
+            <option value="1024">1024</option>
+            <option value="2048">2048</option>
+            <option value="2560">2560</option>
+            <option value="3072">3072</option>
+            <option value="4096">4096</option>
+            <option value="5120">5120</option>
+            <option value="7168">7168</option>
+            <option value="8192">8192</option>
+            <option value="10240">10240</option>
+            <option value="12288">12288</option>
+            <option value="16384">16384</option>
+            <option value="21760">21760</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Power Consumption (W)</label>
+        
+          <select class="mfrFormSelect" name="power_consumption" >
+            
+            <option value="">Select option</option>
+            <option value="75">75</option>
+            <option value="100">100</option>
+            <option value="120">120</option>
+            <option value="150">150</option>
+            <option value="160">160</option>
+            <option value="200">200</option>
+            <option value="225">225</option>
+            <option value="250">250</option>
+            <option value="300">300</option>
+            <option value="350">350</option>
+            <option value="450">450</option>
+            <option value="575">575</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>PCIe Version</label>
+          <select class="mfrFormSelect" name="pci_type_id" >
+            <option value="">Select option</option>
+            <option value="0">PCIe 5.0 x16</option>
+            <option value="1">PCIe 4.0 x16</option>
+            <option value="2">PCIe 3.0 x16</option>
+            <option value="3">PCIe 2.0 x16</option>
+        
+          </select>
+        </div>
+      </div>
+    
+    </div>
+  
+    <!-- Motherboard Fields -->
+    <div id="mfrFieldsMotherboard" class="mfrFormHidden">
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          
+          <label>Chipset Name</label>
+          
+          <select class="mfrFormSelect" name="chipset_name" >
+            <option value="">Select option</option>
+            <option value="X870E">X870E</option>
+            <option value="X870">X870</option>
+            <option value="X670E">X670E</option>
+            <option value="X670">X670</option>
+            <option value="B650E">B650E</option>
+            <option value="B650">B650</option>
+            <option value="A620">A620</option>
+            <option value="X570">X570</option>
+            <option value="B550">B550</option>
+            <option value="A520">A520</option>
+            <option value="Z790">Z790</option>
+            <option value="B760">B760</option>
+            <option value="H770">H770</option>
+            <option value="Z890">Z890</option>
+            <option value="B860">B860</option>
+            <option value="H870">H870</option>
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+          <label>Form Factor</label>
+          <select class="mfrFormSelect" name="form_factor" >
+            <option value="">Select option</option>
+            <option value="ATX">ATX</option>
+            <option value="Micro-ATX">Micro-ATX</option>
+            <option value="Mini-ATX">Mini-ATX</option>
+            <option value="Mini-ITX">Mini-ITX</option>
+            <option value="XT">XT</option>
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+          <label>Socket Type</label>
+          <select class="mfrFormSelect" name="socket_type" >
+          
+            <option value="">Select option</option>
+            <option value="Socket AM4">Socket AM4</option>
+            <option value="Socket AM5">Socket AM5</option>
+            <option value="LGA 1200">LGA 1200</option>
+            <option value="LGA 1700">LGA 1700</option>
+            <option value="LGA 1851">LGA 1851</option>
+          
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+          
+          <label>RAM Type</label>
+          <select class="mfrFormSelect" name="ram_type" >
+            
+            <option value="">Select option</option>
+            <option value="DDR4">DDR4</option>
+            <option value="DDR5">DDR5</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>RAM Slots</label>
+          <select class="mfrFormSelect" name="num_ram_slots" >
+          
+            <option value="">Select option</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="8">8</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Max SATA Connections</label>
+          
+          <select class="mfrFormSelect" name="num_sata_connectors" >
+            <option value="">Select option</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Cooler Headers</label>
+          <select class="mfrFormSelect" name="num_cooler_headers" >
+            <option value="">Select option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Fan Headers</label>
+          <select class="mfrFormSelect" name="num_fan_headers" >
+            
+            <option value="">Select option</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+        
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Has Ethernet Controller</label>
+          <select class="mfrFormSelect" name="has_ethernet" >
+            <option value="">Select option</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          
+          </select>
+        </div>
+      </div>
+    </div>
+  
+    <!-- RAM Fields -->
+    <div id="mfrFieldsRam" class="mfrFormHidden">
+      
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          <label>Capacity (GB)</label>
+          <select class="mfrFormSelect" name="capacity" >
+            <option value="">Select option</option>
+            <option value="4">4</option>
+            <option value="8">8</option>
+            <option value="16">16</option>
+            <option value="32">32</option>
+            <option value="64">64</option>
+            <option value="128">128</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Max Frequency (MHz)</label>
+          <select class="mfrFormSelect" name="max_freq" >
+          
+            <option value="">Select option</option>
+            <option value="2400">2400</option>
+            <option value="2666">2666</option>
+            <option value="3000">3000</option>
+            <option value="3200">3200</option>
+            <option value="3600">3600</option>
+            <option value="4000">4000</option>
+            <option value="4800">4800</option>
+            <option value="5200">5200</option>
+            <option value="5600">5600</option>
+            <option value="6000">6000</option>
+            <option value="6400">6400</option>
+            <option value="7200">7200</option>
+            <option value="8000">8000</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+        
+          <label>RAM Type</label>
+          <select class="mfrFormSelect" name="ram_type" >
+            <option value="">Select option</option>
+            <option value="DDR4">DDR4</option>
+            <option value="DDR5">DDR5</option>
+          </select>
+        
+        </div>
+      </div>
+    </div>
+  
+    <!-- Storage Fields -->
+    <div id="mfrFieldsStorage" class="mfrFormHidden">
+      
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          <label>Storage Type</label>
+          <select class="mfrFormSelect" name="storage_type" id="mfrStorageType" >
+            
+            <option value="">Select option</option>
+            <option value="m2">M.2 NVMe</option>
+            <option value="sata">SATA SSD</option>
+            <option value="hhd">HDD</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Capacity (GB)</label>
+          
+          <select class="mfrFormSelect" name="capacity" >
+            <option value="">Select option</option>
+            <option value="120">120</option>
+            <option value="240">240</option>
+            <option value="250">250</option>
+            <option value="500">500</option>
+            <option value="512">512</option>
+            <option value="1000">1000 (1TB)</option>
+            <option value="2000">2000 (2TB)</option>
+            <option value="4000">4000 (4TB)</option>
+            <option value="8000">8000 (8TB)</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Read Speed (MB/s)</label>
+          
+          <select class="mfrFormSelect" name="read_speed" >
+            <option value="">Select option</option>
+            <option value="150">150</option>
+            <option value="500">500</option>
+            <option value="550">550</option>
+            <option value="2000">2000</option>
+            <option value="3500">3500</option>
+            <option value="5000">5000</option>
+            <option value="7000">7000</option>
+            <option value="10000">10000</option>
+            <option value="12000">12000</option>
+            <option value="14000">14000</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Write Speed (MB/s)</label>
+        
+          <select class="mfrFormSelect" name="write_speed" >
+            <option value="">Select option</option>
+            <option value="150">150</option>
+            <option value="500">500</option>
+            <option value="520">520</option>
+            <option value="1500">1500</option>
+            <option value="2500">2500</option>
+            <option value="4000">4000</option>
+            <option value="5000">5000</option>
+            <option value="6500">6500</option>
+            <option value="10000">10000</option>
+            <option value="12000">12000</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Form Factor</label>
+          
+          <select class="mfrFormSelect" name="form_factor" >
+          
+            <option value="">Select option</option>
+            <option value="M.2 2280">M.2 2280</option>
+            <option value="M.2 2230">M.2 2230</option>
+            <option value="2.5 inch">2.5 inch</option>
+            <option value="3.5 inch">3.5 inch</option>
+        
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup" id="mfrStoragePciField" class="mfrFormHidden">
+          
+          <label>PCIe Version (M.2 only)</label>
+          <select class="mfrFormSelect" name="pci_type_id" >
+            
+            <option value="">Select option</option>
+            <option value="4">PCIe 5.0 x4</option>
+            <option value="5">PCIe 4.0 x4</option>
+            <option value="6">PCIe 3.0 x4</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup" id="mfrStorageInterfaceField">
+          <label>Interface (SATA/HDD only)</label>
+          <select class="mfrFormSelect" name="interface" >
+            <option value="">Select option</option>
+            <option value="SATA III">SATA III (6 Gb/s)</option>
+            <option value="SATA II">SATA II (3 Gb/s)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  
+    <!-- PSU Fields -->
+    <div id="mfrFieldsPsu" class="mfrFormHidden">
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          <label>Power Rating (W)</label>
+          
+          <select class="mfrFormSelect" name="power_rating" >
+            <option value="">Select option</option>
+            <option value="450">450W</option>
+            <option value="500">500W</option>
+            <option value="550">550W</option>
+            <option value="600">600W</option>
+            <option value="650">650W</option>
+            <option value="700">700W</option>
+            <option value="750">750W</option>
+            <option value="800">800W</option>
+            <option value="850">850W</option>
+            <option value="1000">1000W</option>
+            <option value="1200">1200W</option>
+            <option value="1500">1500W</option>
+            <option value="1600">1600W</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Modular</label>
+          <select class="mfrFormSelect" name="modular" >
+            <option value="">Select option</option>
+            <option value="1">Full Modular</option>
+            <option value="0">Non-Modular</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Length (mm)</label>
+          <select class="mfrFormSelect" name="length_mm" >
+            <option value="">Select option</option>
+            <option value="120">120</option>
+            <option value="140">140</option>
+            <option value="150">150</option>
+            <option value="160">160</option>
+            <option value="170">170</option>
+            <option value="180">180</option>
+            <option value="200">200</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Case Fields -->
+    <div id="mfrFieldsCase" class="mfrFormHidden">
+      
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          <label>Height (mm)</label>
+          
+          <select class="mfrFormSelect" name="height" >
+            <option value="">Select option</option>
+            <option value="300">300</option>
+            <option value="350">350</option>
+            <option value="400">400</option>
+            <option value="450">450</option>
+            <option value="500">500</option>
+            <option value="550">550</option>
+            <option value="600">600</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Width (mm)</label>
+          <select class="mfrFormSelect" name="width" >
+            <option value="">Select option</option>
+            <option value="170">170</option>
+            <option value="200">200</option>
+            <option value="210">210</option>
+            <option value="230">230</option>
+            <option value="240">240</option>
+            <option value="280">280</option>
+        
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Length (mm)</label>
+          <select class="mfrFormSelect" name="len_case" >
+            <option value="">Select option</option>
+            <option value="350">350</option>
+            <option value="400">400</option>
+            <option value="450">450</option>
+            <option value="500">500</option>
+            <option value="550">550</option>
+            <option value="600">600</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Material</label>
+          <select class="mfrFormSelect" name="material" >
+            <option value="">Select option</option>
+            <option value="Steel">Steel</option>
+            <option value="Aluminum">Aluminum</option>
+            <option value="Tempered Glass">Tempered Glass</option>
+            <option value="Steel/Glass">Steel + Tempered Glass</option>
+            <option value="Aluminum/Glass">Aluminum + Tempered Glass</option>
+            <option value="Mesh/Steel">Mesh + Steel</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+        
+          <label>Num 3.5" Drive Bays</label>
+          <select class="mfrFormSelect" name="num_35_bays" >
+            <option value="">Select option</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+      
+        <div class="mfrFormGroup">
+          
+          <label>Num 2.5" Drive Bays</label>
+          <select class="mfrFormSelect" name="num_25_bays" >
+            <option value="">Select option</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          
+          <label>Max GPU Length (mm)</label>
+          <select class="mfrFormSelect" name="max_gpu_len_mm" >
+            <option value="">Select option</option>
+            <option value="280">280</option>
+            <option value="300">300</option>
+            <option value="330">330</option>
+            <option value="350">350</option>
+            <option value="370">370</option>
+            <option value="400">400</option>
+            <option value="420">420</option>
+          </select>
+        
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Max PSU Length (mm)</label>
+          
+          <select class="mfrFormSelect" name="max_psu_len_mm" >
+            
+            <option value="">Select option</option>
+            <option value="160">160</option>
+            <option value="180">180</option>
+            <option value="200">200</option>
+            <option value="220">220</option>
+            <option value="250">250</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+        
+          <label>Max Air Cooler Height (mm)</label>
+          <select class="mfrFormSelect" name="max_air_cooler_height" >
+            <option value="">Select option</option>
+            <option value="140">140</option>
+            <option value="155">155</option>
+            <option value="160">160</option>
+            <option value="165">165</option>
+            <option value="170">170</option>
+            <option value="180">180</option>
+            <option value="200">200</option>
+          
+          </select>
+        </div>
+      </div>
+    </div>
+  
+    <!-- CPU Cooler Fields -->
+    <div id="mfrFieldsCpuCooler" class="mfrFormHidden">
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          <label>Cooler Type</label>
+          <select class="mfrFormSelect" id="mfrCoolerType" name="cooler_type" >
+            <option value="">Select option</option>
+            <option value="air">Air CPU Cooler</option>
+            <option value="liquid">Liquid CPU Cooler</option>
+          </select>
+        </div>
+        <div class="mfrFormGroup">
+          <label>Noise Level (dBA)</label>
+          
+          <select class="mfrFormSelect" name="noise_level" >
+            <option value="">Select option</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+            <option value="28">28</option>
+            <option value="30">30</option>
+            <option value="33">33</option>
+            <option value="36">36</option>
+            <option value="39">39</option>
+            <option value="42">42</option>
+          </select>
+        </div>
+      </div>
+  
+      <div id="mfrFieldsAirCooler" class="mfrFormHidden" style="margin-top:20px;">
+        <div class="mfrFormGrid">
+          <div class="mfrFormGroup">
+            <label>Fan RPM</label>
+            
+            <select class="mfrFormSelect" name="air_fan_rpm" >
+              <option value="">Select option</option>
+              <option value="1000">1000</option>
+              <option value="1200">1200</option>
+              <option value="1500">1500</option>
+              <option value="1700">1700</option>
+              <option value="2000">2000</option>
+              <option value="2500">2500</option>
+            </select>
+          </div>
+          
+          <div class="mfrFormGroup">
+            <label>Height (mm)</label>
+            
+            <select class="mfrFormSelect" name="air_height" >
+              <option value="">Select option</option>
+              <option value="120">120</option>
+              <option value="130">130</option>
+              <option value="140">140</option>
+              <option value="150">150</option>
+              <option value="155">155</option>
+              <option value="160">160</option>
+              <option value="165">165</option>
+              <option value="170">170</option>
+            
+            </select>
+          </div>
+        </div>
+      </div>
+  
+      <div id="mfrFieldsLiquidCooler" class="mfrFormHidden" style="margin-top:20px;">
+        <div class="mfrFormGrid">
+          <div class="mfrFormGroup">
+            
+            <label>Number of Fans</label>
+            <select class="mfrFormSelect" name="num_fans" >
+              <option value="">Select option</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            
+            </select>
+          </div>
+          
+          <div class="mfrFormGroup">
+            
+            <label>Radiator Length (mm)</label>
+            <select class="mfrFormSelect" name="len_cool" >
+            
+              <option value="">Select option</option>
+              <option value="120">120</option>
+              <option value="240">240</option>
+              <option value="280">280</option>
+              <option value="360">360</option>
+              <option value="420">420</option>
+            </select>
+          </div>
+          
+          <div class="mfrFormGroup">
+            <label>Radiator Width (mm)</label>
+            <select class="mfrFormSelect" name="liquid_width" >
+              <option value="">Select option</option>
+              <option value="120">120</option>
+              <option value="140">140</option>
+            </select>
+          </div>
+          
+          <div class="mfrFormGroup">
+            
+            <label>Radiator Height (mm)</label>
+          
+            <select class="mfrFormSelect" name="liquid_height" >
+              <option value="">Select option</option>
+              <option value="27">27</option>
+              <option value="30">30</option>
+              <option value="38">38</option>
+              <option value="45">45</option>
+              <option value="55">55</option>
+            </select>
+          </div>
+          
+          <div class="mfrFormGroup">
+            
+            <label>Fan RPM</label>
+            
+            <select class="mfrFormSelect" name="liquid_fan_rpm" >
+              <option value="">Select option</option>
+              <option value="1500">1500</option>
+              <option value="2000">2000</option>
+              <option value="2500">2500</option>
+            
+              <option value="3000">3000</option>
+            </select>
+          </div>
+          
+          <div class="mfrFormGroup">
+            <label>Cooling Tube Length (mm)</label>
+            
+            <select class="mfrFormSelect" name="cooling_tube_length" >
+              <option value="">Select option</option>
+              <option value="300">300</option>
+              <option value="350">350</option>
+              <option value="400">400</option>
+              <option value="450">450</option>
+              <option value="500">500</option>
+            
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Fan Fields -->
+    <div id="mfrFieldsFan" class="mfrFormHidden">
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          
+          <label>Fan Size (mm)</label>
+          
+          <select class="mfrFormSelect" name="size_category_mm" >
+            <option value="">Select option</option>
+            <option value="90">90mm</option>
+            <option value="120">120mm</option>
+            <option value="140">140mm</option>
+            <option value="200">200mm</option>
+          
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Fan RPM</label>
+          
+          <select class="mfrFormSelect" name="fan_rpm" >
+            <option value="">Select option</option>
+            <option value="800">800</option>
+            <option value="1000">1000</option>
+            <option value="1200">1200</option>
+            <option value="1500">1500</option>
+            <option value="1800">1800</option>
+            <option value="2000">2000</option>
+            <option value="2100">2100</option>
+            <option value="2500">2500</option>
+          </select>
+        </div>
+        
+        <div class="mfrFormGroup">
+          <label>Noise Level (dBA)</label>
+          
+          <select class="mfrFormSelect" name="noise_level" >
+            <option value="">Select option</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+            <option value="28">28</option>
+            <option value="30">30</option>
+            <option value="33">33</option>
+            <option value="36">36</option>
+            <option value="40">40</option>
+          
+          </select>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Ethernet Controller Fields -->
+    <div id="mfrFieldsEthernetController" class="mfrFormHidden">
+      
+      <div class="mfrFormGrid">
+      
+        <div class="mfrFormGroup">
+          <label>Controller Name</label>
+          <input type="text" class="mfrFormInput" name="eth_product_name" placeholder="e.g. Intel Ethernet I226-V" >
+        
+        </div>
+      </div>
+    </div>
+  
+    <!-- Wifi Module Fields -->
+    <div id="mfrFieldsWifiModule" class="mfrFormHidden">
+    
+      <div class="mfrFormGrid">
+        <div class="mfrFormGroup">
+          <label>Module Name</label>
+          <input type="text" class="mfrFormInput" name="wifi_product_name" placeholder="e.g. Intel Wi-Fi 6E AX211" >
+        </div>
+        <div class="mfrFormGroup">
+          
+          <label>PCIe Version</label>
+          <select class="mfrFormSelect" name="wifi_pci_type_id" >
+            
+            <option value="">Select option</option>
+            <option value="4">PCIe 5.0 x4</option>
+            <option value="5">PCIe 4.0 x4</option>
+            <option value="6">PCIe 3.0 x4</option>
+            <option value="7">PCIe 2.0 x4</option>
+          </select>
+        
+        </div>
+      </div>
+        <div class="mfrFormGroup">
+            <label>Pin Count</label>
+            <select class="mfrFormSelect" name="wifi_pin_count" >
+              <option value="">Select option</option>
+              <option value="1">1</option>
+              <option value="4">4</option>
+              <option value="8">8</option>
+              <option value="16">16</option>
+            </select>
+          </div>
+    </div>
+  
+    <button class="mfrAddBtn" id="mfrAddBtn" type="button">Add</button>
+  </section>
+  
+  <input type="hidden" name="component_type" id="componentTypeInput" value="" >
+  
+  <button class="mfrAddBtn" id="mfrAddBtn" type="submit">Add</button>
 
-  <button class="mfrAddBtn" id="mfrAddBtn" type="button">Add</button>
-</section>
+</form>
 {% endblock %}
-
+ 
 {% block scripts %}
 <script>
-  const componentSelect = document.getElementById('componentSelect');
-  const formSection = document.getElementById('mfrFormSection');
-  const formTitle = document.getElementById('mfrFormTitle');
-  const coolerTypeSelect = document.getElementById('mfrCoolerType');
-  const addBtn = document.getElementById('mfrAddBtn');
-
-  const componentMap = {
+  var componentSelect = document.getElementById('componentSelect');
+  var formSection = document.getElementById('mfrFormSection');
+  var formTitle = document.getElementById('mfrFormTitle');
+  var coolerTypeSelect = document.getElementById('mfrCoolerType');
+  var addBtn = document.getElementById('mfrAddBtn');
+ 
+  var componentMap = {
     'cpu': { id: 'mfrFieldsCpu', name: 'CPU' },
     'gpu': { id: 'mfrFieldsGpu', name: 'GPU' },
     'motherboard': { id: 'mfrFieldsMotherboard', name: 'Motherboard' },
@@ -263,45 +1274,48 @@
     'ethernet-controller': { id: 'mfrFieldsEthernetController', name: 'Ethernet Controller' },
     'wifi-module': { id: 'mfrFieldsWifiModule', name: 'Wifi Module' }
   };
-
+ 
   function hideAllComponentFields() {
-    Object.values(componentMap).forEach(item => {
-      document.getElementById(item.id).classList.add('mfrFormHidden');
-    });
-
+    var keys = Object.keys(componentMap);
+    for (var i = 0; i < keys.length; i++) {
+      document.getElementById(componentMap[keys[i]].id).classList.add('mfrFormHidden');
+    }
     document.getElementById('mfrFieldsAirCooler').classList.add('mfrFormHidden');
     document.getElementById('mfrFieldsLiquidCooler').classList.add('mfrFormHidden');
   }
-
+ 
   componentSelect.addEventListener('change', function () {
-    const selectedValue = this.value;
+      document.getElementById('componentTypeInput').value = this.value;
 
+    var selectedValue = this.value;
     hideAllComponentFields();
-
+ 
     if (!selectedValue || !componentMap[selectedValue]) {
       formSection.classList.add('mfrFormHidden');
       return;
     }
-
+ 
     formSection.classList.remove('mfrFormHidden');
     formTitle.textContent = componentMap[selectedValue].name;
     document.getElementById(componentMap[selectedValue].id).classList.remove('mfrFormHidden');
   });
-
+ 
   coolerTypeSelect.addEventListener('change', function () {
-    const airFields = document.getElementById('mfrFieldsAirCooler');
-    const liquidFields = document.getElementById('mfrFieldsLiquidCooler');
+      document.getElementById('componentTypeInput').value = this.value;
 
+    var airFields = document.getElementById('mfrFieldsAirCooler');
+    var liquidFields = document.getElementById('mfrFieldsLiquidCooler');
+ 
     airFields.classList.add('mfrFormHidden');
     liquidFields.classList.add('mfrFormHidden');
-
+ 
     if (this.value === 'air') {
       airFields.classList.remove('mfrFormHidden');
     } else if (this.value === 'liquid') {
       liquidFields.classList.remove('mfrFormHidden');
     }
   });
-
+ 
   addBtn.addEventListener('click', function () {
     alert('Component added successfully!');
   });

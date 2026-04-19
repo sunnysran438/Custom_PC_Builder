@@ -16,49 +16,47 @@
     <div class="supplierColActions"></div>
   </div>
 
-  <div class="supplierRow" data-id="1">
-    <div class="supplierColName">AMD Ryzen 7 5800X</div>
-    <div class="supplierColSold" data-field="units_sold">5</div>
-    <div class="supplierColLists">1</div>
-    <div class="supplierColPrice" data-field="price">425.71</div>
-    <div class="supplierColAvail" data-field="availability">In stock</div>
+  {% if items %}
+    {% for item in items %}
+    
+    <div class="supplierRow" data-id="{{ item.item_number }}">
+      <div class="supplierColName">{{ item.product_name }}</div>
+      <div class="supplierColSold" data-field="units_sold">{{ item.units_sold }}</div>
+      <div class="supplierColLists">0</div>
+      <div class="supplierColPrice" data-field="price">{{ item.price }}</div>
+      <div class="supplierColAvail" data-field="availability">{{ item.availability }}</div>
+      <div class="supplierColActions">
+        <button type="button" class="supplierBtnEdit">Edit</button>
+      </div>
+    </div>
+    
+    {% endfor %}
+  {% else %}
+   
+    <div class="supplierRow">
+      <div class="supplierColName" style="color: #999;">No items in inventory yet.</div>
+      <div class="supplierColSold"></div>
+      <div class="supplierColLists"></div>
+      <div class="supplierColPrice"></div>
+      <div class="supplierColAvail"></div>
+      <div class="supplierColActions"></div>
+    </div>
+  {% endif %}
+
+  <div class="supplierRow">
+    
+    <div class="supplierColName"></div>
+    <div class="supplierColSold"></div>
+    <div class="supplierColLists"></div>
+    <div class="supplierColPrice"></div>
+    <div class="supplierColAvail"></div>
     <div class="supplierColActions">
-      <button type="button" class="supplierBtnEdit">Edit</button>
+      <a href="{% url 'supplier_search_page' %}">
+        <button class="mfrViewAddBtn" style="width: 80px; height: 36px; font-size: 14px;">+ Add</button>
+      </a>
     </div>
   </div>
 
-  <div class="supplierRow" data-id="2">
-    <div class="supplierColName">AMD Ryzen 5 5500 6-Core</div>
-    <div class="supplierColSold" data-field="units_sold">3</div>
-    <div class="supplierColLists">2</div>
-    <div class="supplierColPrice" data-field="price">284.28</div>
-    <div class="supplierColAvail" data-field="availability">In stock</div>
-    <div class="supplierColActions">
-      <button type="button" class="supplierBtnEdit">Edit</button>
-    </div>
-  </div>
-
-  <div class="supplierRow" data-id="3">
-    <div class="supplierColName">AMD Ryzen 5 9600X 6-Core</div>
-    <div class="supplierColSold" data-field="units_sold">43</div>
-    <div class="supplierColLists">3</div>
-    <div class="supplierColPrice" data-field="price">259.99</div>
-    <div class="supplierColAvail" data-field="availability">In stock</div>
-    <div class="supplierColActions">
-      <button type="button" class="supplierBtnEdit">Edit</button>
-    </div>
-  </div>
-
-  <div class="supplierRow" data-id="4">
-    <div class="supplierColName">AMD Ryzen 7 9700X 8-Core</div>
-    <div class="supplierColSold" data-field="units_sold">16</div>
-    <div class="supplierColLists">4</div>
-    <div class="supplierColPrice" data-field="price">430.00</div>
-    <div class="supplierColAvail" data-field="availability">out of stock</div>
-    <div class="supplierColActions">
-      <button type="button" class="supplierBtnEdit">Edit</button>
-    </div>
-  </div>
 </section>
 {% endblock %}
 
@@ -69,22 +67,22 @@
       return;
     }
 
-    const btn = e.target;
-    const row = btn.closest('.supplierRow');
+    var btn = e.target;
+    var row = btn.closest('.supplierRow');
 
     if (btn.textContent === 'Edit') {
-      const soldCell = row.querySelector('[data-field="units_sold"]');
-      const priceCell = row.querySelector('[data-field="price"]');
-      const availCell = row.querySelector('[data-field="availability"]');
+      var soldCell = row.querySelector('[data-field="units_sold"]');
+      var priceCell = row.querySelector('[data-field="price"]');
+      var availCell = row.querySelector('[data-field="availability"]');
 
-      const soldVal = soldCell.textContent.trim();
-      const priceVal = priceCell.textContent.trim();
-      const availVal = availCell.textContent.trim();
+      var soldVal = soldCell.textContent.trim();
+      var priceVal = priceCell.textContent.trim();
+      var availVal = availCell.textContent.trim();
 
       soldCell.innerHTML = '<input type="number" class="supplierEditInput" value="' + soldVal + '">';
       priceCell.innerHTML = '<input type="number" step="0.01" class="supplierEditInput" value="' + priceVal + '">';
 
-      let selectHTML = '<select class="supplierEditSelect">';
+      var selectHTML = '<select class="supplierEditSelect">';
       selectHTML += '<option value="In stock"' + (availVal === 'In stock' ? ' selected' : '') + '>In stock</option>';
       selectHTML += '<option value="out of stock"' + (availVal === 'out of stock' ? ' selected' : '') + '>out of stock</option>';
       selectHTML += '</select>';
@@ -94,13 +92,13 @@
       btn.classList.remove('supplierBtnEdit');
       btn.classList.add('supplierBtnDone');
     } else {
-      const soldInput = row.querySelector('[data-field="units_sold"] input');
-      const priceInput = row.querySelector('[data-field="price"] input');
-      const availSelect = row.querySelector('[data-field="availability"] select');
+      var soldInput = row.querySelector('[data-field="units_sold"] input');
+      var priceInput = row.querySelector('[data-field="price"] input');
+      var availSelect = row.querySelector('[data-field="availability"] select');
 
-      const newSold = soldInput.value;
-      const newPrice = priceInput.value;
-      const newAvail = availSelect.value;
+      var newSold = soldInput.value;
+      var newPrice = priceInput.value;
+      var newAvail = availSelect.value;
 
       row.querySelector('[data-field="units_sold"]').textContent = newSold;
       row.querySelector('[data-field="price"]').textContent = parseFloat(newPrice || 0).toFixed(2);
@@ -110,13 +108,42 @@
       btn.classList.remove('supplierBtnDone');
       btn.classList.add('supplierBtnEdit');
 
-      console.log('Data to send to backend:', {
-        id: row.getAttribute('data-id'),
-        units_sold: newSold,
-        price: newPrice,
-        availability: newAvail
-      });
+      var itemId = row.getAttribute('data-id');
+      
+      var updatedData = {
+          item_number: row.getAttribute('data-id'),
+          price: newPrice,
+          units_sold: newSold,
+          availability: newAvail
+      };
+      
+      fetch('/supplier/update-item/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(updatedData)
+      })
+      .then(function (response) { return response.json(); })
+      .then(function (data) { console.log('Updated:', data); })
+      .catch(function (error) { console.error('Error:', error); });
     }
   });
+
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 </script>
 {% endblock %}

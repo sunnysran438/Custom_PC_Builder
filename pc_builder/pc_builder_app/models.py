@@ -47,3 +47,19 @@ class Build(models.Model):
 class BuildItem(models.Model):
     build = models.ForeignKey(Build, on_delete=models.CASCADE)
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
+
+
+class Customer(models.Model):
+    
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+   
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    province = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+    
+    phone = models.CharField(max_length=20)
+    password = models.CharField(max_length=255)

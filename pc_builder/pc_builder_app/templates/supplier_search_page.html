@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+ 
+{% block title %}Browse Components - PC Component Builder{% endblock %}
+ 
+{% block content %}
+<section class="supplierBrowseSection">
+  <h1>Browse Components</h1>
+ 
+  <!-- Filters -->
+  <div class="supplierBrowseFilters">
+    <form method="get" class="supplierBrowseFilterForm">
+      
+        <div class="supplierBrowseFilterGroup">
+        <label>Component Type</label>
+        <select name="type" class="supplierBrowseSelect" onchange="this.form.submit()">
+          <option value="">All Types</option>
+          <option value="CPU" {% if selected_type == 'CPU' %}selected{% endif %}>CPU</option>
+          <option value="GPU" {% if selected_type == 'GPU' %}selected{% endif %}>GPU</option>
+          <option value="Motherboard" {% if selected_type == 'Motherboard' %}selected{% endif %}>Motherboard</option>
+          <option value="RAM" {% if selected_type == 'RAM' %}selected{% endif %}>RAM</option>
+          <option value="Storage" {% if selected_type == 'Storage' %}selected{% endif %}>Storage</option>
+          <option value="Power Supply" {% if selected_type == 'Power Supply' %}selected{% endif %}>Power Supply</option>
+          <option value="Case" {% if selected_type == 'Case' %}selected{% endif %}>Case</option>
+          <option value="CPU Cooler" {% if selected_type == 'CPU Cooler' %}selected{% endif %}>CPU Cooler</option>
+          <option value="Fan" {% if selected_type == 'Fan' %}selected{% endif %}>Fan</option>
+          <option value="Ethernet Controller" {% if selected_type == 'Ethernet Controller' %}selected{% endif %}>Ethernet Controller</option>
+          <option value="Wifi Module" {% if selected_type == 'Wifi Module' %}selected{% endif %}>Wifi Module</option>
+        </select>
+      </div>
+      
+      <div class="supplierBrowseFilterGroup">
+        <label>Manufacturer</label>
+        <select name="manufacturer" class="supplierBrowseSelect" onchange="this.form.submit()">
+          <option value="">All Manufacturers</option>
+          {% for mfr in manufacturers %}
+            <option value="{{ mfr.0 }}" {% if selected_manufacturer == mfr.0|stringformat:"d" %}selected{% endif %}>{{ mfr.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    
+    </form>
+  </div>
+ 
+  <!-- Table Header -->
+  <div class="supplierBrowseTableHeader">
+    
+    <div class="supplierBrowseColName">Component Name</div>
+    <div class="supplierBrowseColType">Type</div>
+    <div class="supplierBrowseColMfr">Manufacturer</div>
+    <div class="supplierBrowseColActions">Actions</div>
+  
+    </div>
+ 
+  {% if components %}
+    {% for component in components %}
+    
+    <div class="supplierBrowseRow">
+      
+        <div class="supplierBrowseColName">{{ component.product_name }}</div>
+      <div class="supplierBrowseColType">{{ component.component_type }}</div>
+      <div class="supplierBrowseColMfr">{{ component.manufacturer_name }}</div>
+      <div class="supplierBrowseColActions">
+        
+        {% if component.in_inventory %}
+          <span class="supplierBrowseBadge">In Inventory</span>
+        {% else %}
+        
+        <form method="post" action="{% url 'supplier_add_item' %}" style="display: inline;">
+            
+            {% csrf_token %}
+            <input type="hidden" name="list_part_id" value="{{ component.list_part_id }}">
+            <button type="submit" class="supplierBrowseBtnAdd">Add</button>
+        
+        </form>
+        
+        {% endif %}
+      </div>
+    </div>
+    
+    {% endfor %}
+  {% else %}
+   
+  <div class="supplierBrowseRow">
+      <div class="supplierBrowseColName" style="color: #999;">No components found.</div>
+      <div class="supplierBrowseColType"></div>
+      <div class="supplierBrowseColMfr"></div>
+      <div class="supplierBrowseColActions"></div>
+    </div>
+  
+    {% endif %}
+ 
+</section>
+{% endblock %}

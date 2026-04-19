@@ -86,27 +86,32 @@ DROP TABLE IF EXISTS CUSTOMER;
 
 -- User tables #####################################################################
 CREATE TABLE CUSTOMER(
+   
     customer_id INTEGER NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     first_name VARCHAR(63) NOT NULL,
-    middle_name VARCHAR(63),
     last_name VARCHAR(63),
-    postal_code VARCHAR(63) NOT NULL,
-    street_no VARCHAR(63) NOT NULL,
+    street VARCHAR(63) NOT NULL,
     city VARCHAR(63) NOT NULL,
     province VARCHAR(63) NOT NULL,
+    postal_code VARCHAR(63) NOT NULL,
     country VARCHAR(63) NOT NULL,
+    phone VARCHAR(20),
+    password VARCHAR(255) NOT NULL,
     PRIMARY KEY(customer_id)
 );
 
 CREATE TABLE MANUFACTURER(
     manufacturer_id INTEGER NOT NULL,
     manufacturer_name VARCHAR(63) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     PRIMARY KEY(manufacturer_id)
 );
 
 CREATE TABLE SUPPLIER(
     supplier_id INTEGER NOT NULL,
     supplier_name VARCHAR(63) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     PRIMARY KEY(supplier_id)
 );
 
@@ -121,6 +126,8 @@ CREATE TABLE STORE_ITEM(
     supplier_id INTEGER NOT NULL,
     price FLOAT(24) NOT NULL,
     list_part_id INTEGER NOT NULL,
+    units_sold INTEGER DEFAULT 0,
+    availability VARCHAR(31) DEFAULT 'In stock',
     PRIMARY KEY(item_number),
     FOREIGN KEY(supplier_id) REFERENCES SUPPLIER(supplier_id),
     FOREIGN KEY(list_part_id) REFERENCES LIST_PART(list_part_id)
@@ -443,30 +450,30 @@ CREATE TABLE CASE_FAN_SIZE_COMPATIBLE(
 
 -- User tables #####################################################################
 
--- (custID, 'firstname', 'middlename', 'lastname', 'A0A 0A0', '123-routeway','city','province', 'country')
-INSERT INTO CUSTOMER VALUES(1, 'Art', 'middlename', 'Vandeley', 'A0A 0A0', '123-routeway','New York','New York', 'U.S.A');
+-- (custID, 'email', 'firstname', 'lastname', 'street', 'city', 'province', 'postal_code', 'country', 'phone', 'password')
+INSERT INTO CUSTOMER VALUES(1, 'art@email.com', 'Art', 'Vandeley', '123-routeway', 'New York', 'New York', 'A0A 0A0', 'U.S.A', '555-1234', 'password123');
 
--- (manid, 'name')
+-- (manid, 'name', 'password')
 INSERT INTO MANUFACTURER VALUES
-(1, "Nvidia"),
-(2, "Intel"),
-(3, "AMD"),
-(4, "Crosair"),
-(5, "Asus"),
-(6, "G.SKILL"),
-(7, "Qualcomm"),
-(8, "MSI"),
-(9, "GIGABYTE"),
-(10, "Arctic"),
-(11, "Seagate"),
-(12, "Realtek");
+(1, "Nvidia", "nvidia123"),
+(2, "Intel", "intel123"),
+(3, "AMD", "amd123"),
+(4, "Crosair", "crosair123"),
+(5, "Asus", "asus123"),
+(6, "G.SKILL", "gskill123"),
+(7, "Qualcomm", "qualcomm123"),
+(8, "MSI", "msi123"),
+(9, "GIGABYTE", "gigabyte123"),
+(10, "Arctic", "arctic123"),
+(11, "Seagate", "seagate123"),
+(12, "Realtek", "realtek123");
 
--- (supid, 'name')
+-- (supid, 'name', 'password')
 INSERT INTO SUPPLIER VALUES
-(1, "Amazon"),
-(2, "Newegg"),
-(3, "Memory Express"),
-(4, "Best Buy");
+(1, "Amazon", "amazon123"),
+(2, "Newegg", "newegg123"),
+(3, "Memory Express", "memex123"),
+(4, "Best Buy", "bestbuy123");
 
 -- Base classes ####################################################################
 -- (listpartid)
@@ -490,24 +497,23 @@ INSERT INTO LIST_PART VALUES
 
 -- (itmnumber, supid, price,listpartid)
 INSERT INTO STORE_ITEM VALUES
-(1, 1, 100.0, 16),
-(2, 2, 100.0, 15),
-(3, 3, 100.0, 14),
-(4, 4, 100.0, 13),
-(5, 1, 100.0, 12),
-(6, 2, 100.0, 11),
-(7, 3, 200.0, 1),
-(8, 3, 120.0, 2),
-(9, 3, 20.0, 3),
-(10, 3, 100.0, 4),
-(11, 3, 250.0, 5),
-(12, 3, 220.0, 6),
-(13, 3, 500.0, 7),
-(14, 3, 550.0, 8),
-(15, 3, 1500.0, 9),
-(16, 3, 900.0, 10),
-(17, 3, 100.0, 11);
-
+(1, 1, 100.0, 16, 0, 'In stock'),
+(2, 2, 100.0, 15, 0, 'In stock'),
+(3, 3, 100.0, 14, 0, 'In stock'),
+(4, 4, 100.0, 13, 0, 'In stock'),
+(5, 1, 100.0, 12, 0, 'In stock'),
+(6, 2, 100.0, 11, 0, 'In stock'),
+(7, 3, 200.0, 1, 0, 'In stock'),
+(8, 3, 120.0, 2, 0, 'In stock'),
+(9, 3, 20.0, 3, 0, 'In stock'),
+(10, 3, 100.0, 4, 0, 'In stock'),
+(11, 3, 250.0, 5, 0, 'In stock'),
+(12, 3, 220.0, 6, 0, 'In stock'),
+(13, 3, 500.0, 7, 0, 'In stock'),
+(14, 3, 550.0, 8, 0, 'In stock'),
+(15, 3, 1500.0, 9, 0, 'In stock'),
+(16, 3, 900.0, 10, 0, 'In stock'),
+(17, 3, 100.0, 11, 0, 'In stock');
 
 -- (partid, manid, listpartid)
 INSERT INTO COMPONENT VALUES
@@ -688,6 +694,30 @@ def manuel_query(query):
 # MANUFACTURER STUFF###############################################################################################################################
 # #################################################################################################################################################
 
+def get_manufacturer_by_name(name, password):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    print(f"Looking for manufacturer: name='{name}', password='{password}'")
+
+
+    query_string = f"SELECT * FROM MANUFACTURER WHERE manufacturer_name = '{name}' AND password = '{password}'"
+    try:
+        cursor.execute(query_string)
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return None
+
+    conn.close()
+
+    if len(results) > 0:
+        return results[0]
+    else:
+        return None
+
+
 def get_manufacturers():
     """gets a list of all manufacturers"""
 
@@ -749,7 +779,7 @@ def add_manufacturer(name: str) -> bool:
     new_id = current_max + 1
     
     # command for adding the manufacturer
-    query_string = f"INSERT INTO MANUFACTURER VALUES ({new_id},'{name}');"
+    query_string = f"INSERT INTO MANUFACTURER VALUES ({new_id},'{name}')"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -775,7 +805,7 @@ def delete_manufacturer(id: int) -> bool:
     cursor = conn.cursor()
 
     # command to delete from build lists 
-    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE CONTAINS_COMPONENT.list_part_id IN (SELECT COMPONENT.list_part_id FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id});"
+    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE CONTAINS_COMPONENT.list_part_id IN (SELECT COMPONENT.list_part_id FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -784,7 +814,7 @@ def delete_manufacturer(id: int) -> bool:
         return False
 
     # command to delete asociated store items
-    query_string = f"DELETE FROM STORE_ITEM WHERE STORE_ITEM.list_part_id IN (SELECT COMPONENT.list_part_id FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id});"
+    query_string = f"DELETE FROM STORE_ITEM WHERE STORE_ITEM.list_part_id IN (SELECT COMPONENT.list_part_id FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -795,7 +825,7 @@ def delete_manufacturer(id: int) -> bool:
     # loop over every part table and delete parts with this manufacturer 
     output=[]
     for part_type in COMPONENT_TABLES_SYS:
-        query_string = f"DELETE FROM {part_type} WHERE {part_type}.list_part_id IN (SELECT COMPONENT.list_part_id FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id});"
+        query_string = f"DELETE FROM {part_type} WHERE {part_type}.list_part_id IN (SELECT COMPONENT.list_part_id FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id})"
 
         try:
             cursor.execute(query_string)
@@ -809,7 +839,7 @@ def delete_manufacturer(id: int) -> bool:
             output = output + results
     
     # command to delete list part
-    query_string = f"DELETE FROM LIST_PART WHERE LIST_PART.list_part_id IN (SELECT COMPONENT.list_part_id FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id});"
+    query_string = f"DELETE FROM LIST_PART WHERE LIST_PART.list_part_id IN (SELECT COMPONENT.list_part_id FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -818,7 +848,7 @@ def delete_manufacturer(id: int) -> bool:
         return False
     
     # command to delete the component base class
-    query_string = f"DELETE FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id};"
+    query_string = f"DELETE FROM COMPONENT WHERE COMPONENT.manufacturer_id = {id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -828,7 +858,7 @@ def delete_manufacturer(id: int) -> bool:
     
     
     # command for deleting the manufacturer
-    query_string = f"DELETE FROM MANUFACTURER WHERE manufacturer_id={id};"
+    query_string = f"DELETE FROM MANUFACTURER WHERE manufacturer_id={id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -841,36 +871,128 @@ def delete_manufacturer(id: int) -> bool:
 
     return True
 
-def get_parts_of_manufacturer(manufacturer_id:int):
-    """returns a list of all the parts bellonging to a manufacturer"""
-
-    # open the database
+def get_components_by_manufacturer(manufacturer_id):
+    """Get all components added by a specific manufacturer"""
     conn = sqlite3.connect("parts_picker.db")
     cursor = conn.cursor()
-    
 
-    # loop over every part table and get the parts 
-    output=[]
-    for part_type in COMPONENT_TABLES:
-        query_string = f"SELECT * FROM (SELECT * FROM COMPONENT WHERE COMPONENT.manufacturer_id = {manufacturer_id}) AS T INNER JOIN {part_type} ON {part_type}.list_part_id = T.list_part_id;"
+    query_string = f"""
+        SELECT c.part_id, 
+               COALESCE(cpu.product_name, gpu.product_name, mb.product_name, 
+                        ram.product_name, sto.product_name, psu.product_name, 
+                        pc.product_name, fan.product_name, cool.product_name,
+                        eth.product_name, wifi.product_name) as product_name,
+               CASE
+                   WHEN cpu.list_part_id IS NOT NULL THEN 'CPU'
+                   WHEN gpu.list_part_id IS NOT NULL THEN 'GPU'
+                   WHEN mb.list_part_id IS NOT NULL THEN 'Motherboard'
+                   WHEN ram.list_part_id IS NOT NULL THEN 'RAM'
+                   WHEN sto.list_part_id IS NOT NULL THEN 'Storage'
+                   WHEN psu.list_part_id IS NOT NULL THEN 'Power Supply'
+                   WHEN pc.list_part_id IS NOT NULL THEN 'Case'
+                   WHEN fan.list_part_id IS NOT NULL THEN 'Fan'
+                   WHEN cool.list_part_id IS NOT NULL THEN 'CPU Cooler'
+                   WHEN eth.list_part_id IS NOT NULL THEN 'Ethernet Controller'
+                   WHEN wifi.list_part_id IS NOT NULL THEN 'Wifi Module'
+                   ELSE 'Unknown'
+               END as component_type
+        FROM COMPONENT c
+        LEFT JOIN CPU cpu ON c.list_part_id = cpu.list_part_id
+        LEFT JOIN GPU gpu ON c.list_part_id = gpu.list_part_id
+        LEFT JOIN MOTHERBOARD mb ON c.list_part_id = mb.list_part_id
+        LEFT JOIN RAM ram ON c.list_part_id = ram.list_part_id
+        LEFT JOIN STORAGE sto ON c.list_part_id = sto.list_part_id
+        LEFT JOIN POWER_SUPPLY_UNIT psu ON c.list_part_id = psu.list_part_id
+        LEFT JOIN PC_CASE pc ON c.list_part_id = pc.list_part_id
+        LEFT JOIN FAN fan ON c.list_part_id = fan.list_part_id
+        LEFT JOIN CPU_COOLER cool ON c.list_part_id = cool.list_part_id
+        LEFT JOIN ETHERNET_CONTROLLER eth ON c.list_part_id = eth.list_part_id
+        LEFT JOIN WIFI_MODULE wifi ON c.list_part_id = wifi.list_part_id
+        WHERE c.manufacturer_id = {manufacturer_id}
+    """
+    try:
+        cursor.execute(query_string)
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return []
 
-        try:
-            cursor.execute(query_string)
-            results = cursor.fetchall()
-        except sqlite3.Error as e:
-            print(f"query error: {e}")
+    conn.close()
+
+    components = []
+    for row in results:
+        components.append({
+            'part_id': row[0],
+            'product_name': row[1],
+            'component_type': row[2]
+        })
+    return components
+
+
+def delete_component(part_id):
+    """Delete a component by part_id"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(f"SELECT list_part_id FROM COMPONENT WHERE part_id = {part_id}")
+        result = cursor.fetchone()
+        if not result:
             conn.close()
             return False
-        
-        if len(results) > 0:
-            output = output + results
-        
+
+        list_part_id = result[0]
+
+        cursor.execute(f"DELETE FROM COMPONENT WHERE part_id = {part_id}")
+        cursor.execute(f"DELETE FROM CPU WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM GPU WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM MOTHERBOARD WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM RAM WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM STORAGE WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM POWER_SUPPLY_UNIT WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM PC_CASE WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM FAN WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM CPU_COOLER WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM ETHERNET_CONTROLLER WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM WIFI_MODULE WHERE list_part_id = {list_part_id}")
+        cursor.execute(f"DELETE FROM LIST_PART WHERE list_part_id = {list_part_id}")
+
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return False
+
     conn.close()
-    return output
+    return True
 
 
 # SUPPLIER STUFF###############################################################################################################################
 # #################################################################################################################################################
+
+
+def get_supplier_by_name(name, password):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    query_string = f"SELECT * FROM SUPPLIER WHERE supplier_name = '{name}' AND password = '{password}'"
+    try:
+        cursor.execute(query_string)
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return None
+
+    conn.close()
+
+    if len(results) > 0:
+        return results[0]
+    else:
+        return None
+
+
 def get_suppliers():
     """gets a list of all suppliers"""
 
@@ -951,7 +1073,7 @@ def add_supplier(name:str)->bool:
     new_id = current_max + 1
     
     # command for adding the supplier
-    query_string = f"INSERT INTO SUPPLIER VALUES ({new_id},'{name}');"
+    query_string = f"INSERT INTO SUPPLIER VALUES ({new_id},'{name}')"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -976,7 +1098,7 @@ def delete_supplier(id: int) -> bool:
     cursor = conn.cursor()
     
     # command for deleting the supplier
-    query_string = f"DELETE FROM SUPPLIER WHERE supplier_id={id};"
+    query_string = f"DELETE FROM SUPPLIER WHERE supplier_id={id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -999,7 +1121,7 @@ def get_parts_sold_by_supplier(supplier_id:int):
     # loop over every part table and get the parts 
     output=[]
     for part_type in COMPONENT_TABLES:
-        query_string = f"SELECT * FROM (SELECT * FROM STORE_ITEM WHERE STORE_ITEM.supplier_id = {supplier_id}) AS T INNER JOIN {part_type} ON {part_type}.list_part_id = T.list_part_id;"
+        query_string = f"SELECT * FROM (SELECT * FROM STORE_ITEM WHERE STORE_ITEM.supplier_id = {supplier_id}) AS T INNER JOIN {part_type} ON {part_type}.list_part_id = T.list_part_id"
 
         try:
             cursor.execute(query_string)
@@ -1070,7 +1192,7 @@ def add_store_item(list_part_id:int, supplier_id:int, price:int)->bool:
     
     # the store item does not exist so add it
     # first get highest id number of the store items
-    query_string = f"SELECT MAX(item_number) FROM STORE_ITEM;"
+    query_string = f"SELECT MAX(item_number) FROM STORE_ITEM"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1087,7 +1209,7 @@ def add_store_item(list_part_id:int, supplier_id:int, price:int)->bool:
     new_id = current_max + 1
     
     # command for adding the customer
-    query_string = f"INSERT INTO STORE_ITEM VALUES ({new_id},{supplier_id}, {price}, {list_part_id});"
+    query_string = f"INSERT INTO STORE_ITEM VALUES ({new_id}, {supplier_id}, {price}, {list_part_id}, 0, 'In stock')"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1112,7 +1234,7 @@ def delete_store_item(item_number : int) -> bool:
     cursor = conn.cursor()
     
     # command for deleting the store item
-    query_string = f"DELETE FROM STORE_ITEM WHERE item_number = {item_number};"
+    query_string = f"DELETE FROM STORE_ITEM WHERE item_number = {item_number}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1124,6 +1246,176 @@ def delete_store_item(item_number : int) -> bool:
     conn.close()
 
     return True
+
+def get_all_components(filter_type='', filter_manufacturer='', supplier_id=None):
+    """Get all components with optional filters, marks if already in supplier inventory"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    query_string = """
+        SELECT c.part_id, c.list_part_id, c.manufacturer_id, m.manufacturer_name,
+               COALESCE(cpu.product_name, gpu.product_name, mb.product_name,
+                        ram.product_name, sto.product_name, psu.product_name,
+                        pc.product_name, fan.product_name, cool.product_name,
+                        eth.product_name, wifi.product_name) as product_name,
+               CASE
+                   WHEN cpu.list_part_id IS NOT NULL THEN 'CPU'
+                   WHEN gpu.list_part_id IS NOT NULL THEN 'GPU'
+                   WHEN mb.list_part_id IS NOT NULL THEN 'Motherboard'
+                   WHEN ram.list_part_id IS NOT NULL THEN 'RAM'
+                   WHEN sto.list_part_id IS NOT NULL THEN 'Storage'
+                   WHEN psu.list_part_id IS NOT NULL THEN 'Power Supply'
+                   WHEN pc.list_part_id IS NOT NULL THEN 'Case'
+                   WHEN fan.list_part_id IS NOT NULL THEN 'Fan'
+                   WHEN cool.list_part_id IS NOT NULL THEN 'CPU Cooler'
+                   WHEN eth.list_part_id IS NOT NULL THEN 'Ethernet Controller'
+                   WHEN wifi.list_part_id IS NOT NULL THEN 'Wifi Module'
+                   ELSE 'Unknown'
+               END as component_type
+        FROM COMPONENT c
+        JOIN MANUFACTURER m ON c.manufacturer_id = m.manufacturer_id
+        LEFT JOIN CPU cpu ON c.list_part_id = cpu.list_part_id
+        LEFT JOIN GPU gpu ON c.list_part_id = gpu.list_part_id
+        LEFT JOIN MOTHERBOARD mb ON c.list_part_id = mb.list_part_id
+        LEFT JOIN RAM ram ON c.list_part_id = ram.list_part_id
+        LEFT JOIN STORAGE sto ON c.list_part_id = sto.list_part_id
+        LEFT JOIN POWER_SUPPLY_UNIT psu ON c.list_part_id = psu.list_part_id
+        LEFT JOIN PC_CASE pc ON c.list_part_id = pc.list_part_id
+        LEFT JOIN FAN fan ON c.list_part_id = fan.list_part_id
+        LEFT JOIN CPU_COOLER cool ON c.list_part_id = cool.list_part_id
+        LEFT JOIN ETHERNET_CONTROLLER eth ON c.list_part_id = eth.list_part_id
+        LEFT JOIN WIFI_MODULE wifi ON c.list_part_id = wifi.list_part_id
+    """
+
+    try:
+        cursor.execute(query_string)
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return []
+
+    # Get supplier's existing inventory
+    inventory_ids = []
+    if supplier_id:
+        try:
+            cursor.execute(f"SELECT list_part_id FROM STORE_ITEM WHERE supplier_id = {supplier_id}")
+            inventory_ids = [row[0] for row in cursor.fetchall()]
+        except sqlite3.Error as e:
+            print(f"query error: {e}")
+
+    conn.close()
+
+    components = []
+    for row in results:
+        component_type = row[5]
+        manufacturer_id = row[2]
+
+        # Apply filters
+        if filter_type and component_type != filter_type:
+            continue
+        if filter_manufacturer and str(manufacturer_id) != str(filter_manufacturer):
+            continue
+
+        components.append({
+            'part_id': row[0],
+            'list_part_id': row[1],
+            'manufacturer_id': manufacturer_id,
+            'manufacturer_name': row[3],
+            'product_name': row[4],
+            'component_type': component_type,
+            'in_inventory': row[1] in inventory_ids,
+        })
+
+    return components
+
+
+def get_manufacturers():
+    """Get all manufacturers as list of tuples (id, name)"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT manufacturer_id, manufacturer_name FROM MANUFACTURER")
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return []
+
+    conn.close()
+    return results
+
+
+def get_supplier_inventory(supplier_id):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    query_string = f"""
+        SELECT si.item_number, si.price, si.list_part_id,
+               COALESCE(cpu.product_name, gpu.product_name, mb.product_name,
+                        ram.product_name, sto.product_name, psu.product_name,
+                        pc.product_name, fan.product_name, cool.product_name,
+                        eth.product_name, wifi.product_name) as product_name,
+               si.units_sold, si.availability
+        FROM STORE_ITEM si
+        LEFT JOIN CPU cpu ON si.list_part_id = cpu.list_part_id
+        LEFT JOIN GPU gpu ON si.list_part_id = gpu.list_part_id
+        LEFT JOIN MOTHERBOARD mb ON si.list_part_id = mb.list_part_id
+        LEFT JOIN RAM ram ON si.list_part_id = ram.list_part_id
+        LEFT JOIN STORAGE sto ON si.list_part_id = sto.list_part_id
+        LEFT JOIN POWER_SUPPLY_UNIT psu ON si.list_part_id = psu.list_part_id
+        LEFT JOIN PC_CASE pc ON si.list_part_id = pc.list_part_id
+        LEFT JOIN FAN fan ON si.list_part_id = fan.list_part_id
+        LEFT JOIN CPU_COOLER cool ON si.list_part_id = cool.list_part_id
+        LEFT JOIN ETHERNET_CONTROLLER eth ON si.list_part_id = eth.list_part_id
+        LEFT JOIN WIFI_MODULE wifi ON si.list_part_id = wifi.list_part_id
+        WHERE si.supplier_id = {supplier_id}
+    """
+
+    try:
+        cursor.execute(query_string)
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return []
+
+    conn.close()
+
+    items = []
+    for row in results:
+        items.append({
+            'item_number': row[0],
+            'price': row[1],
+            'list_part_id': row[2],
+            'product_name': row[3],
+            'units_sold': row[4] if row[4] else 0,
+            'availability': row[5] if row[5] else 'In stock',
+        })
+    return items
+
+
+def update_store_item(item_number, price, units_sold, availability):
+    """Update a store item"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "UPDATE STORE_ITEM SET price = ?, units_sold = ?, availability = ? WHERE item_number = ?",
+            (price, units_sold, availability, item_number)
+        )
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return False
+
+    conn.close()
+    return True
+
+
 
 # CUSTOMER STUFF###############################################################################################################################
 # #################################################################################################################################################
@@ -1141,15 +1433,14 @@ def get_customers():
     results = cursor.fetchall()
     conn.close()
     return results
-
-def add_customer(first_name:str, middle_name:str, last_name:str, postal_code:str, street_no:str, city:str, province:str, country:str)->bool:
+def add_customer(email, first_name, last_name, street, city, province, postal_code, country, phone, password):
     """Add a customer to table 'CUSTOMER' returns true on success"""
     # open the database
     conn = sqlite3.connect("parts_picker.db")
     cursor = conn.cursor()
     
-    # query the database to see if this supplier already exists, if so return false
-    query_string = f"SELECT * FROM CUSTOMER WHERE first_name = '{first_name}' AND last_name = '{last_name}'"
+    # query the database to see if this customer already exists by email
+    query_string = f"SELECT * FROM CUSTOMER WHERE email = '{email}'"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1160,7 +1451,7 @@ def add_customer(first_name:str, middle_name:str, last_name:str, postal_code:str
     
     if len(results) > 0:
         conn.close()
-        print(("Could not add customer: %s %s as this person already exists" % (first_name, last_name)))
+        print("Could not add customer: %s as this email already exists" % email)
         return False
     
     # the customer does not exist so add them
@@ -1182,7 +1473,7 @@ def add_customer(first_name:str, middle_name:str, last_name:str, postal_code:str
     new_id = current_max + 1
     
     # command for adding the customer
-    query_string = f"INSERT INTO CUSTOMER VALUES ({new_id},'{first_name}', '{middle_name}', '{last_name}', '{postal_code}', '{street_no}', '{city}', '{province}', '{country}');"
+    query_string = f"INSERT INTO CUSTOMER VALUES ({new_id}, '{email}', '{first_name}', '{last_name}', '{street}', '{city}', '{province}', '{postal_code}', '{country}', '{phone}', '{password}')"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1196,7 +1487,6 @@ def add_customer(first_name:str, middle_name:str, last_name:str, postal_code:str
 
     return True
 
-
 def delete_customer(customer_id:int)->bool:
     """Delete a customer from table 'CUSTOMER', modifies tables 'BUILD_LIST' and 'CONTAINS_COMPONENT' returns true on success"""
     # open the database
@@ -1204,7 +1494,7 @@ def delete_customer(customer_id:int)->bool:
     cursor = conn.cursor()
     
     # command for deleting the customer
-    query_string = f"DELETE FROM CUSTOMER WHERE customer_id={customer_id};"
+    query_string = f"DELETE FROM CUSTOMER WHERE customer_id={customer_id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1216,6 +1506,28 @@ def delete_customer(customer_id:int)->bool:
     conn.close()
 
     return True
+
+
+def get_customer_by_email(email, password):
+    """Get a customer by email and password, returns customer tuple or None"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    query_string = f"SELECT * FROM CUSTOMER WHERE email = '{email}' AND password = '{password}'"
+    try:
+        cursor.execute(query_string)
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return None
+
+    conn.close()
+
+    if len(results) > 0:
+        return results[0]
+    else:
+        return None
 
 def create_build_list(customer_id:int)->bool:
     """add a build list to 'BUILD_LIST' returns true on success"""
@@ -1257,7 +1569,7 @@ def create_build_list(customer_id:int)->bool:
     new_id = current_max + 1
     
     # command for adding the new build list
-    query_string = f"INSERT INTO BUILD_LIST VALUES ({new_id},{customer_id});"
+    query_string = f"INSERT INTO BUILD_LIST VALUES ({new_id},{customer_id})"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1278,7 +1590,7 @@ def delete_build_list(list_id:int)->bool:
     cursor = conn.cursor()
     
     # command for deleting the build list
-    query_string = f"DELETE FROM BUILD_LIST WHERE list_number={list_id};"
+    query_string = f"DELETE FROM BUILD_LIST WHERE list_number={list_id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1288,7 +1600,7 @@ def delete_build_list(list_id:int)->bool:
     
     # delete from the contains component table
     # command for deleting the customer
-    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE list_number={list_id};"
+    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE list_number={list_id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1355,7 +1667,7 @@ def add_to_build_list(list_id:int, list_part_id:int, num_comps:int)->bool:
     
     # the list exists, and the component exists, so add the component to the list
     # command for adding the customer
-    query_string = f"INSERT INTO CONTAINS_COMPONENT VALUES ({list_id}, {list_part_id}, {num_comps});"
+    query_string = f"INSERT INTO CONTAINS_COMPONENT VALUES ({list_id}, {list_part_id}, {num_comps})"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1376,7 +1688,7 @@ def delete_part_in_build_list(list_id:int, list_part_id:int)->bool:
     cursor = conn.cursor()
     
     # command for deleting the build list component
-    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE list_number={list_id} AND list_part_id={list_part_id};"
+    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE list_number={list_id} AND list_part_id={list_part_id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1451,6 +1763,13 @@ def display_all_build_lists():
 # Adding components ###############################################################################################################################
 # #################################################################################################################################################
 
+
+
+
+
+
+
+
 def add_base_part(manufacturer_id:int, cursor: sqlite3.Cursor)->bool:
     """adds a base part, used internally, do not call from the frontend or interface"""
     # query the database to ensure that the manufacturer exists, if not return false
@@ -1467,8 +1786,8 @@ def add_base_part(manufacturer_id:int, cursor: sqlite3.Cursor)->bool:
         return False
     
     # the manufacturer does exist so add the part
-    # first get highest id number of the component and the list part id
-    query_string = "SELECT MAX(part_id), MAX(list_part_id) FROM COMPONENT;"
+    # get highest part_id from COMPONENT
+    query_string = "SELECT MAX(part_id) FROM COMPONENT"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1477,20 +1796,27 @@ def add_base_part(manufacturer_id:int, cursor: sqlite3.Cursor)->bool:
         return False
 
     part_id = results[0][0]
-    list_part_id = results[0][1]
-
-    
     if part_id == None:
         part_id = -1
-    
+    part_id += 1
+
+    # get highest list_part_id from LIST_PART
+    query_string = "SELECT MAX(list_part_id) FROM LIST_PART"
+    try:
+        cursor.execute(query_string)
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        return False
+
+    list_part_id = results[0][0]
     if list_part_id == None:
         list_part_id = -1
-
-    part_id += 1
     list_part_id += 1
+
     print("list part id: %d" % (list_part_id))
     # command for adding the part to components
-    query_string = f"INSERT INTO COMPONENT VALUES ({part_id}, {manufacturer_id}, {list_part_id});"
+    query_string = f"INSERT INTO COMPONENT VALUES ({part_id}, {manufacturer_id}, {list_part_id})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1498,7 +1824,7 @@ def add_base_part(manufacturer_id:int, cursor: sqlite3.Cursor)->bool:
         return False
     
     # command for adding part to list part
-    query_string = f"INSERT INTO LIST_PART VALUES ({list_part_id});"
+    query_string = f"INSERT INTO LIST_PART VALUES ({list_part_id})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1507,7 +1833,8 @@ def add_base_part(manufacturer_id:int, cursor: sqlite3.Cursor)->bool:
     
     return part_id, list_part_id
 
-def add_part_psu(manufacturer_id:int, product_name: str, power_rating: int, modular: bool, length_mm: bool, connectors) -> bool:
+
+def add_psu(manufacturer_id:int, product_name: str, power_rating: int, modular: bool, length_mm: bool, connectors) -> bool:
     """adds to tables: 'LIST_PART' and 'POWER_SUPPLY_UNIT' and 'POWER_SUPPLY_CONNECTORS' returns true on success,
     connectors is an array with tuple elements {conn_type:str, num_pins:int, count:int}"""
 
@@ -1526,7 +1853,7 @@ def add_part_psu(manufacturer_id:int, product_name: str, power_rating: int, modu
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO POWER_SUPPLY_UNIT VALUES ({list_part_id}, '{product_name}', {power_rating}, {modular}, {length_mm});"
+    query_string = f"INSERT INTO POWER_SUPPLY_UNIT VALUES ({list_part_id}, '{product_name}', {power_rating}, {modular}, {length_mm})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1542,7 +1869,7 @@ def add_part_psu(manufacturer_id:int, product_name: str, power_rating: int, modu
                 # for each connector 
                 conn_type, num_pins, count = c
                 # command for adding the part 
-                query_string = f"INSERT INTO POWER_SUPPLY_CONNECTORS VALUES ({list_part_id},'{conn_type}', {num_pins}, {count});"
+                query_string = f"INSERT INTO POWER_SUPPLY_CONNECTORS VALUES ({list_part_id},'{conn_type}', {num_pins}, {count})"
                 try:
                     cursor.execute(query_string)
                 except sqlite3.Error as e:
@@ -1562,7 +1889,7 @@ def add_form_factor(form_factor:str)->bool:
     cursor = conn.cursor()
     
     # query the database to see if this form factor already exists
-    query_string = f"SELECT * FROM MOTHERBOARD_FORM_FACTOR WHERE form_factor = '{form_factor}';"
+    query_string = f"SELECT * FROM MOTHERBOARD_FORM_FACTOR WHERE form_factor = '{form_factor}'"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1578,7 +1905,7 @@ def add_form_factor(form_factor:str)->bool:
     # first get highest id number of the existing customer
 
     # command for adding the customer
-    query_string = f"INSERT INTO MOTHERBOARD_FORM_FACTOR VALUES ('{form_factor}');"
+    query_string = f"INSERT INTO MOTHERBOARD_FORM_FACTOR VALUES ('{form_factor}')"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1600,7 +1927,7 @@ def add_fan_size(fan_size:int)->bool:
     cursor = conn.cursor()
     
     # query the database to see if this fan size already exists
-    query_string = f"SELECT * FROM FAN_SIZE WHERE size_category_mm = {fan_size};"
+    query_string = f"SELECT * FROM FAN_SIZE WHERE size_category_mm = {fan_size}"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1615,7 +1942,7 @@ def add_fan_size(fan_size:int)->bool:
     # the fan size does not exist so add the new form factor
 
     # command for adding the customer
-    query_string = f"INSERT INTO FAN_SIZE VALUES ({fan_size});"
+    query_string = f"INSERT INTO FAN_SIZE VALUES ({fan_size})"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1641,7 +1968,7 @@ def add_case_form_factor_compatible(case_id:int, form_factor:str):
     cursor = conn.cursor()
     
     # query the database to see if this element already exists
-    query_string = f"SELECT * FROM CASE_FORM_FACTOR_COMPATIBLE WHERE list_part_id = {case_id} AND form_factor = '{form_factor}';"
+    query_string = f"SELECT * FROM CASE_FORM_FACTOR_COMPATIBLE WHERE list_part_id = {case_id} AND form_factor = '{form_factor}'"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1656,7 +1983,7 @@ def add_case_form_factor_compatible(case_id:int, form_factor:str):
     # the fan size does not exist so add the new form factor
 
     # command for adding the element
-    query_string = f"INSERT INTO CASE_FORM_FACTOR_COMPATIBLE VALUES ({case_id},'{form_factor}');"
+    query_string = f"INSERT INTO CASE_FORM_FACTOR_COMPATIBLE VALUES ({case_id},'{form_factor}')"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1681,7 +2008,7 @@ def add_case_fans_compatible(case_id:int, size_category_mm:int, num_fans:int):
     cursor = conn.cursor()
     
     # query the database to see if this element already exists
-    query_string = f"SELECT * FROM CASE_FAN_SIZE_COMPATIBLE WHERE list_part_id = {case_id} AND size_category_mm = {size_category_mm};"
+    query_string = f"SELECT * FROM CASE_FAN_SIZE_COMPATIBLE WHERE list_part_id = {case_id} AND size_category_mm = {size_category_mm}"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1696,7 +2023,7 @@ def add_case_fans_compatible(case_id:int, size_category_mm:int, num_fans:int):
     # the fan size does not exist so add the new form factor
 
     # command for adding the element
-    query_string = f"INSERT INTO CASE_FAN_SIZE_COMPATIBLE VALUES ({case_id},{size_category_mm},{num_fans});"
+    query_string = f"INSERT INTO CASE_FAN_SIZE_COMPATIBLE VALUES ({case_id},{size_category_mm},{num_fans})"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1710,7 +2037,7 @@ def add_case_fans_compatible(case_id:int, size_category_mm:int, num_fans:int):
     
     return True
 
-def add_part_case(manufacturer_id:int, product_name: str,
+def add_case(manufacturer_id:int, product_name: str,
                 height: int, width: int, len_case: int, material: str,
                 num_35_bays: int, num_25_bays:int, max_gpu_length_mm:int, 
                 max_psu_length_mm:int,max_air_cooler_height:int, 
@@ -1737,7 +2064,7 @@ def add_part_case(manufacturer_id:int, product_name: str,
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO PC_CASE VALUES ({list_part_id}, '{product_name}', {height}, {width}, {len_case}, '{material}', {num_35_bays}, {num_25_bays}, {max_gpu_length_mm}, {max_psu_length_mm}, {max_air_cooler_height});"
+    query_string = f"INSERT INTO PC_CASE VALUES ({list_part_id}, '{product_name}', {height}, {width}, {len_case}, '{material}', {num_35_bays}, {num_25_bays}, {max_gpu_length_mm}, {max_psu_length_mm}, {max_air_cooler_height})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1763,7 +2090,7 @@ def add_part_case(manufacturer_id:int, product_name: str,
 
     return True
 
-def add_part_fan(manufacturer_id:int, product_name:str, fan_rpm:int, noise_level:float, size_category_mm:int)->bool:
+def add_fan(manufacturer_id:int, product_name:str, fan_rpm:int, noise_level:float, size_category_mm:int)->bool:
     """adds to tables: 'LIST_PART' and 'FAN' and 'FAN_SIZE'returns true on success'"""
     # ensure that the form factor exists
     add_fan_size(size_category_mm)
@@ -1783,7 +2110,7 @@ def add_part_fan(manufacturer_id:int, product_name:str, fan_rpm:int, noise_level
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO FAN VALUES ({list_part_id}, '{product_name}', {fan_rpm}, {noise_level}, {size_category_mm});"
+    query_string = f"INSERT INTO FAN VALUES ({list_part_id}, '{product_name}', {fan_rpm}, {noise_level}, {size_category_mm})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1796,7 +2123,7 @@ def add_part_fan(manufacturer_id:int, product_name:str, fan_rpm:int, noise_level
     conn.close()
     return True
 
-def add_part_ethernetcontroller(manufacturer_id:int, product_name:str)->bool:
+def add_ethernet_controller(manufacturer_id:int, product_name:str)->bool:
     """adds to tables: 'LIST_PART' and 'ETHERNET_CONTROLLER' returns true on success'"""
     # open the database
     conn = sqlite3.connect("parts_picker.db")
@@ -1813,7 +2140,7 @@ def add_part_ethernetcontroller(manufacturer_id:int, product_name:str)->bool:
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO ETHERNET_CONTROLLER VALUES ({list_part_id}, '{product_name}');"
+    query_string = f"INSERT INTO ETHERNET_CONTROLLER VALUES ({list_part_id}, '{product_name}')"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1826,41 +2153,32 @@ def add_part_ethernetcontroller(manufacturer_id:int, product_name:str)->bool:
     conn.close()
     return True
 
-def add_socket_type(cpu_socket_type:str):
+def add_socket_type(cpu_socket_type):
     """add a cpu socket type"""
-    # open the database
     conn = sqlite3.connect("parts_picker.db")
     cursor = conn.cursor()
-    
-    # query the database to see if this fan size already exists
-    query_string = f"SELECT * FROM CPU_SOCKET_TYPE WHERE socket_type = '{cpu_socket_type}';"
+
     try:
-        cursor.execute(query_string)
+        cursor.execute("SELECT * FROM CPU_SOCKET_TYPE WHERE socket_type = ?", (cpu_socket_type,))
         results = cursor.fetchall()
     except sqlite3.Error as e:
         print(f"query error: {e}")
         conn.close()
         return False
-    
+
     if len(results) > 0:
         conn.close()
         return False
-    # the fan size does not exist so add the new form factor
 
-    # command for adding the customer
-    query_string = f"INSERT INTO CPU_SOCKET_TYPE VALUES ('{cpu_socket_type}');"
     try:
-        cursor.execute(query_string)
-        results = cursor.fetchall()
+        cursor.execute("INSERT INTO CPU_SOCKET_TYPE VALUES (?)", (cpu_socket_type,))
+        conn.commit()
     except sqlite3.Error as e:
         print(f"query error: {e}")
         conn.close()
         return False
-    
-    print("added new socket type %s" % (cpu_socket_type))
-    conn.commit()
-    conn.close()
 
+    conn.close()
     return True
 
 def add_ram_type(ram_type:int):
@@ -1870,7 +2188,7 @@ def add_ram_type(ram_type:int):
     cursor = conn.cursor()
     
     # query the database to see if this fan size already exists
-    query_string = f"SELECT * FROM RAM_TYPE WHERE ram_type = {ram_type};"
+    query_string = f"SELECT * FROM RAM_TYPE WHERE ram_type = {ram_type}"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1885,7 +2203,7 @@ def add_ram_type(ram_type:int):
     # the fan size does not exist so add the new form factor
 
     # command for adding the customer
-    query_string = f"INSERT INTO RAM_TYPE VALUES ({ram_type});"
+    query_string = f"INSERT INTO RAM_TYPE VALUES ({ram_type})"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()
@@ -1900,7 +2218,7 @@ def add_ram_type(ram_type:int):
 
     return True
 
-def add_part_motherboard(manufacturer_id:int, product_name:str, num_ram_slots:int, chipset_name:str, num_sata_conn:int,num_cooler_headers:int, num_fan_headers:int, form_factor:str, socket_type:str, ram_type:int, eth_controller:int,io_ports, pci_slots)->bool:
+def add_motherboard(manufacturer_id:int, product_name:str, num_ram_slots:int, chipset_name:str, num_sata_conn:int,num_cooler_headers:int, num_fan_headers:int, form_factor:str, socket_type:str, ram_type:int, eth_controller:int,io_ports, pci_slots)->bool:
     """adds to tables: 'LIST_PART', 'MOTHERBOARD', 'MOTHERBOARD_IO_PORTS', 'MOTHERBOARD_PCI_SLOT','PCI_SLOT','ETHERNET_CONTROLLER' returns true on success
     io_ports is an array with tuple elements {version:str, generation:str, con_type:str,count:int}
     pci_slots is an array with tuple elements {pci_version:str, pin_count:int, num_slots:int}'"""
@@ -1925,7 +2243,7 @@ def add_part_motherboard(manufacturer_id:int, product_name:str, num_ram_slots:in
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO MOTHERBOARD VALUES ({list_part_id}, '{product_name}', {num_ram_slots}, '{chipset_name}', {num_sata_conn}, {num_cooler_headers}, {num_fan_headers}, '{form_factor}', '{socket_type}', {ram_type}, {eth_controller});"
+    query_string = f"INSERT INTO MOTHERBOARD VALUES ({list_part_id}, '{product_name}', {num_ram_slots}, '{chipset_name}', {num_sata_conn}, {num_cooler_headers}, {num_fan_headers}, '{form_factor}', '{socket_type}', {ram_type}, {eth_controller})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1954,7 +2272,7 @@ def add_part_cpu_cooler(manufacturer_id:int, product_name:str, noise_level:int):
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO CPU_COOLER VALUES ({list_part_id}, '{product_name}', {noise_level});"
+    query_string = f"INSERT INTO CPU_COOLER VALUES ({list_part_id}, '{product_name}', {noise_level})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1968,7 +2286,7 @@ def add_part_cpu_cooler(manufacturer_id:int, product_name:str, noise_level:int):
 
     return list_part_id
 
-def add_part_air_cooler(manufacturer_id:int, product_name:str, noise_level:int, fan_rpm:int, height:int)->bool:
+def add_air_cooler(manufacturer_id:int, product_name:str, noise_level:int, fan_rpm:int, height:int)->bool:
     """adds to tables: 'LIST_PART' and 'AIR_COOLER','CPU_COOLER' returns true on success'"""
 
     # create the base part
@@ -1981,7 +2299,7 @@ def add_part_air_cooler(manufacturer_id:int, product_name:str, noise_level:int, 
     cursor = conn.cursor()
     
     # command for adding the part 
-    query_string = f"INSERT INTO AIR_COOLER VALUES ({list_part_id}, {fan_rpm}, {height});"
+    query_string = f"INSERT INTO AIR_COOLER VALUES ({list_part_id}, {fan_rpm}, {height})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -1995,7 +2313,7 @@ def add_part_air_cooler(manufacturer_id:int, product_name:str, noise_level:int, 
 
     return True
 
-def add_part_liquid_cooler(manufacturer_id:int, product_name:str, noise_level:int,num_fans:int, len_cool:int, width:int, height:int, fan_rpm:int, cooling_tube_length:int)->bool:
+def add_liquid_cooler(manufacturer_id:int, product_name:str, noise_level:int,num_fans:int, len_cool:int, width:int, height:int, fan_rpm:int, cooling_tube_length:int)->bool:
     """adds to tables: 'LIST_PART' and 'LIQUID_COOLER','CPU_COOLER' returns true on success'"""
     # create the base part
     list_part_id = add_part_cpu_cooler(manufacturer_id, product_name, noise_level)
@@ -2007,7 +2325,7 @@ def add_part_liquid_cooler(manufacturer_id:int, product_name:str, noise_level:in
     cursor = conn.cursor()
     
     # command for adding the part 
-    query_string = f"INSERT INTO LIQUID_COOLER VALUES ({list_part_id},{num_fans}, {len_cool}, {width}, {height}, {fan_rpm}, {cooling_tube_length});"
+    query_string = f"INSERT INTO LIQUID_COOLER VALUES ({list_part_id},{num_fans}, {len_cool}, {width}, {height}, {fan_rpm}, {cooling_tube_length})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2021,7 +2339,7 @@ def add_part_liquid_cooler(manufacturer_id:int, product_name:str, noise_level:in
 
     return True
 
-def add_part_storage(manufacturer_id:int, product_name:str, capacity:int, read_speed:int, write_speed:int, form_factor:str):
+def add_storage(manufacturer_id:int, product_name:str, capacity:int, read_speed:int, write_speed:int, form_factor:str):
     # open the database
     conn = sqlite3.connect("parts_picker.db")
     cursor = conn.cursor()
@@ -2037,7 +2355,7 @@ def add_part_storage(manufacturer_id:int, product_name:str, capacity:int, read_s
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO STORAGE VALUES ({list_part_id}, '{product_name}', {capacity}, {read_speed}, {write_speed}, '{form_factor}');"
+    query_string = f"INSERT INTO STORAGE VALUES ({list_part_id}, '{product_name}', {capacity}, {read_speed}, {write_speed}, '{form_factor}')"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2051,10 +2369,10 @@ def add_part_storage(manufacturer_id:int, product_name:str, capacity:int, read_s
 
     return list_part_id
 
-def add_part_m2storage(manufacturer_id:int, product_name:str, capacity:int, read_speed:int, write_speed:int, form_factor:str, pci_version:str)->bool:
+def add_m2_storage(manufacturer_id:int, product_name:str, capacity:int, read_speed:int, write_speed:int, form_factor:str, pci_version:str)->bool:
     """adds to tables: 'LIST_PART','STORAGE', 'M2_STORAGE' returns true on success'"""
     # create the base part
-    list_part_id = add_part_storage(manufacturer_id, product_name, capacity, read_speed, write_speed, form_factor)
+    list_part_id = add_storage(manufacturer_id, product_name, capacity, read_speed, write_speed, form_factor)
     if list_part_id == False:
         return False
     
@@ -2063,7 +2381,7 @@ def add_part_m2storage(manufacturer_id:int, product_name:str, capacity:int, read
     cursor = conn.cursor()
     
     # command for adding the part 
-    query_string = f"INSERT INTO M2_STORAGE VALUES ({list_part_id},'{pci_version}');"
+    query_string = f"INSERT INTO M2_STORAGE VALUES ({list_part_id},'{pci_version}')"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2078,10 +2396,10 @@ def add_part_m2storage(manufacturer_id:int, product_name:str, capacity:int, read
     return True
 
 
-def add_part_hhdstorage(manufacturer_id:int, product_name:str, capacity:int, read_speed:int, write_speed:int, form_factor:str, interface:str)->bool:
+def add_hhd_storage(manufacturer_id:int, product_name:str, capacity:int, read_speed:int, write_speed:int, form_factor:str, interface:str)->bool:
     """adds to tables: 'LIST_PART','STORAGE', 'HHD_STORAGE' returns true on success'"""
     # create the base part
-    list_part_id = add_part_storage(manufacturer_id, product_name, capacity, read_speed, write_speed, form_factor)
+    list_part_id = add_storage(manufacturer_id, product_name, capacity, read_speed, write_speed, form_factor)
     if list_part_id == False:
         return False
     
@@ -2090,7 +2408,7 @@ def add_part_hhdstorage(manufacturer_id:int, product_name:str, capacity:int, rea
     cursor = conn.cursor()
     
     # command for adding the part 
-    query_string = f"INSERT INTO HHD_STORAGE VALUES ({list_part_id},'{interface}');"
+    query_string = f"INSERT INTO HHD_STORAGE VALUES ({list_part_id},'{interface}')"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2104,10 +2422,10 @@ def add_part_hhdstorage(manufacturer_id:int, product_name:str, capacity:int, rea
 
     return True
 
-def add_part_satastorage(manufacturer_id:int, product_name:str, capacity:int, read_speed:int, write_speed:int, form_factor:str, interface:str)->bool:
+def add_sata_storage(manufacturer_id:int, product_name:str, capacity:int, read_speed:int, write_speed:int, form_factor:str, interface:str)->bool:
     """adds to tables: 'LIST_PART','STORAGE', 'SATA_STORAGE' returns true on success'"""
     # create the base part
-    list_part_id = add_part_storage(manufacturer_id, product_name, capacity, read_speed, write_speed, form_factor)
+    list_part_id = add_storage(manufacturer_id, product_name, capacity, read_speed, write_speed, form_factor)
     if list_part_id == False:
         return False
     
@@ -2116,7 +2434,7 @@ def add_part_satastorage(manufacturer_id:int, product_name:str, capacity:int, re
     cursor = conn.cursor()
     
     # command for adding the part 
-    query_string = f"INSERT INTO SATA_STORAGE VALUES ({list_part_id},'{interface}');"
+    query_string = f"INSERT INTO SATA_STORAGE VALUES ({list_part_id},'{interface}')"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2131,7 +2449,7 @@ def add_part_satastorage(manufacturer_id:int, product_name:str, capacity:int, re
     return True
 
 
-def add_part_gpu(manufacturer_id:int, product_name:str, series:str, architecture:str, base_clock:int, boost_clock:int, memory_size:int, memory_type:int, num_cores:int, power_cons:int, pci_version:int)->bool:
+def add_gpu(manufacturer_id:int, product_name:str, series:str, architecture:str, base_clock:int, boost_clock:int, memory_size:int, memory_type:int, num_cores:int, power_cons:int, pci_version:int)->bool:
     """adds to tables: 'LIST_PART','GPU','PCI_SLOT' returns true on success'"""
 
 
@@ -2151,7 +2469,7 @@ def add_part_gpu(manufacturer_id:int, product_name:str, series:str, architecture
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO GPU VALUES ({list_part_id}, '{product_name}', '{series}', '{architecture}', {base_clock}, {boost_clock}, {memory_size}, {memory_type}, {num_cores}, {power_cons}, {pci_version});"
+    query_string = f"INSERT INTO GPU VALUES ({list_part_id}, '{product_name}', '{series}', '{architecture}', {base_clock}, {boost_clock}, {memory_size}, {memory_type}, {num_cores}, {power_cons}, {pci_version})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2163,9 +2481,8 @@ def add_part_gpu(manufacturer_id:int, product_name:str, series:str, architecture
     conn.commit()
     conn.close()
 
-    return False
 
-def add_part_ram(manufacturer_id:int, product_name:str, capacity:int, max_freq:int, ram_ddr_type:int)->bool:
+def add_ram(manufacturer_id:int, product_name:str, capacity:int, max_freq:int, ram_ddr_type:int)->bool:
     """adds to tables: 'LIST_PART' and 'RAM', 'RAM_TYPE' returns true on success'"""
     # ensure ram type exists
     add_ram_type(ram_ddr_type)
@@ -2184,7 +2501,7 @@ def add_part_ram(manufacturer_id:int, product_name:str, capacity:int, max_freq:i
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO RAM VALUES ({list_part_id}, '{product_name}', {capacity}, {max_freq}, {ram_ddr_type});"
+    query_string = f"INSERT INTO RAM VALUES ({list_part_id}, '{product_name}', {capacity}, {max_freq}, {ram_ddr_type})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2196,9 +2513,9 @@ def add_part_ram(manufacturer_id:int, product_name:str, capacity:int, max_freq:i
     conn.commit()
     conn.close()
 
-    return False
+    return True
 
-def add_part_cpu(manufacturer_id:int, product_name:str, chip_family:str, series:str, tdp:int, base_clock:int, boost_clock:int, l1_cache:int, l2_cache:int, l3_cache:int, num_cores:int, num_threads:int, architecture:str, socket_type:str, ram_ddr_type:int)->bool:
+def add_cpu(manufacturer_id:int, product_name:str, chip_family:str, series:str, tdp:int, base_clock:int, boost_clock:int, l1_cache:int, l2_cache:int, l3_cache:int, num_cores:int, num_threads:int, architecture:str, socket_type:str, ram_ddr_type:int)->bool:
     """adds to tables: 'LIST_PART','CPU', 'RAM_TYPE', 'CPU_SOCKET_TYPE' returns true on success"""
     # ensure ram type exists
     add_ram_type(ram_ddr_type)
@@ -2218,7 +2535,7 @@ def add_part_cpu(manufacturer_id:int, product_name:str, chip_family:str, series:
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO CPU VALUES ({list_part_id}, '{product_name}', '{chip_family}', '{series}', {tdp}, {base_clock}, {boost_clock}, {l1_cache}, {l2_cache}, {l3_cache}, {num_cores}, {num_threads}, '{architecture}', '{socket_type}', {ram_ddr_type});"
+    query_string = f"INSERT INTO CPU VALUES ({list_part_id}, '{product_name}', '{chip_family}', '{series}', {tdp}, {base_clock}, {boost_clock}, {l1_cache}, {l2_cache}, {l3_cache}, {num_cores}, {num_threads}, '{architecture}', '{socket_type}', {ram_ddr_type})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2230,10 +2547,10 @@ def add_part_cpu(manufacturer_id:int, product_name:str, chip_family:str, series:
     conn.commit()
     conn.close()
 
-    return False
+    return True
 
 
-def add_part_wifimodule(manufacturer_id:int, product_name:str, pci_version:int, pin_count:int)->bool:
+def add_wifi_module(manufacturer_id:int, product_name:str, pci_version:int, pin_count:int)->bool:
     """adds to tables: 'LIST_PART' and 'WIFI_MODULE' and 'PCI_SLOT' returns true on success'"""
     # open the database
     conn = sqlite3.connect("parts_picker.db")
@@ -2250,7 +2567,8 @@ def add_part_wifimodule(manufacturer_id:int, product_name:str, pci_version:int, 
     part_id, list_part_id = res
     
     # command for adding the part 
-    query_string = f"INSERT INTO WIFI_MODULE VALUES ({list_part_id}, '{product_name}', {pci_version});"
+    
+    query_string = f"INSERT INTO WIFI_MODULE VALUES ({list_part_id}, '{product_name}', {pci_version})"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2375,7 +2693,7 @@ def delete_part(list_part_id : int) -> bool:
     cursor = conn.cursor()
 
     # command to delete asociated store items
-    query_string = f"DELETE FROM STORE_ITEM WHERE STORE_ITEM.list_part_id = {list_part_id};"
+    query_string = f"DELETE FROM STORE_ITEM WHERE STORE_ITEM.list_part_id = {list_part_id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2385,7 +2703,7 @@ def delete_part(list_part_id : int) -> bool:
     
 
     # command to delete from build lists 
-    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE CONTAINS_COMPONENT.list_part_id = {list_part_id};"
+    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE CONTAINS_COMPONENT.list_part_id = {list_part_id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2396,7 +2714,7 @@ def delete_part(list_part_id : int) -> bool:
     # loop over every part table and delete parts with this id
     output=[]
     for part_type in COMPONENT_TABLES_SYS:
-        query_string = f"DELETE FROM {part_type} WHERE {part_type}.list_part_id = {list_part_id};"
+        query_string = f"DELETE FROM {part_type} WHERE {part_type}.list_part_id = {list_part_id}"
 
         try:
             cursor.execute(query_string)
@@ -2410,7 +2728,7 @@ def delete_part(list_part_id : int) -> bool:
             output = output + results
     
     # command to delete list part
-    query_string = f"DELETE FROM LIST_PART WHERE LIST_PART.list_part_id = {list_part_id};"
+    query_string = f"DELETE FROM LIST_PART WHERE LIST_PART.list_part_id = {list_part_id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:
@@ -2419,7 +2737,7 @@ def delete_part(list_part_id : int) -> bool:
         return False
     
     # command to delete the component base class
-    query_string = f"DELETE FROM COMPONENT WHERE COMPONENT.list_part_id = {list_part_id};"
+    query_string = f"DELETE FROM COMPONENT WHERE COMPONENT.list_part_id = {list_part_id}"
     try:
         cursor.execute(query_string)
     except sqlite3.Error as e:

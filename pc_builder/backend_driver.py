@@ -1,4 +1,4 @@
-import database_api
+import pc_builder_app.database_api as database_api
 
 database_api.create_tables()
 

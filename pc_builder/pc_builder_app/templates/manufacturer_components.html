@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+ 
+{% block title %}My Components - PC Component Builder{% endblock %}
+ 
+{% block content %}
+<section class="mfrViewSection">
+  <h1>My Components</h1>
+ 
+  <!-- Table Header -->
+  <div class="mfrViewTableHeader">
+    
+    <div class="mfrViewColName">Component Name</div>
+    <div class="mfrViewColType">Type</div>
+    <div class="mfrViewColActions">Actions</div>
+  
+   </div>
+ 
+  {% if components %}
+    {% for component in components %}
+    
+    <div class="mfrViewRow" data-id="{{ component.part_id }}">
+      
+      <div class="mfrViewColName" data-field="name">{{ component.product_name }}</div>
+      <div class="mfrViewColType">{{ component.component_type }}</div>
+      <div class="mfrViewColActions">
+        
+        <a href="{% url 'manufacturer' %}">
+          <button class="mfrViewBtnEdit">Edit</button>
+        </a>
+        
+        <form method="post" action="{% url 'delete_component' component.part_id %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="mfrViewBtnRemove">Remove</button>
+        </form>
+      
+    </div>
+    </div>
+    
+    {% endfor %}
+  {% else %}
+    
+  <div class="mfrViewRow">
+      
+    <div class="mfrViewColName" style="color: #999;">No components added yet.</div>
+      <div class="mfrViewColType"></div>
+      <div class="mfrViewColActions"></div>
+    
+    </div>
+  {% endif %}
+
+
+  <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+    
+    <a href="{% url 'manufacturer' %}">
+      <button class="mfrViewAddBtn">+ Add Component</button>
+    
+    </a>
+  </div>
+ 
+</section>
+{% endblock %}

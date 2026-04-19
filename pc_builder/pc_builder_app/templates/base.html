@@ -21,12 +21,31 @@
       </svg>
     </a>
 
-    <ul class="navbarLinks">
-      <li><a href="{% url 'search' %}">View Components</a></li>
-      <li><a href="{% url 'builder' %}">View Build List</a></li>
+ <ul class="navbarLinks">
+    <li><a href="{% url 'search' %}">View Components</a></li>
+
+    {% if user_type != 'manufacturer' and user_type != 'supplier' %}
+      <li><a href="#">View Build List</a></li>
       <li><a href="{% url 'builder' %}">Builder</a></li>
+    {% endif %}
+
+    {% if user_type == 'manufacturer' %}
+      <li><a href="{% url 'manufacturer' %}">Add Component</a></li>
+      <li><a href="{% url 'view_my_components' %}">View My Components</a></li>
+    {% endif %}
+
+    {% if user_type == 'supplier' %}
+      <li><a href="{% url 'supplier_inventory' %}">Inventory</a></li>
+       <li><a href="{% url 'supplier_search_page' %}">Browse Components</a></li>
+    {% endif %}
+
+    {% if user_type %}
+      <li><a href="{% url 'logout' %}">Logout</a></li>
+    {% else %}
       <li><a href="{% url 'login' %}">Login</a></li>
-    </ul>
+    {% endif %}
+    
+  </ul>
 
     <div class="navbarActions">
       <button class="searchBtn" type="button" aria-label="Search">
@@ -34,6 +53,17 @@
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
         </svg>
       </button>
+
+
+      {% if user_type == 'customer' %}
+        <span style="font-size: 13px; font-weight: 500; color: #333;">Welcome, {{ customer_name }}</span>
+      {% elif user_type == 'manufacturer' %}
+        <span style="font-size: 13px; font-weight: 500; color: #333;">Signed In As {{ manufacturer_name }}</span>
+      {% elif user_type == 'supplier' %}
+        <span style="font-size: 13px; font-weight: 500; color: #333;">Signed In As {{ supplier_name }}</span>
+      {% endif %}
+
+
 
       <div class="profileIcon" aria-hidden="true">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#888" stroke="none">

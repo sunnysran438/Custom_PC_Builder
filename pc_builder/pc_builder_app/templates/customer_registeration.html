@@ -8,6 +8,11 @@
   <div class="registrationCard">
     <h1>Customer Registration</h1>
 
+
+    {% if error %}
+        <p style="color: red; margin-bottom: 16px;">{{ error }}</p>
+    {% endif %}
+
     <form method="post">
       {% csrf_token %}
 
@@ -54,6 +59,11 @@
       <div class="regFormGroup">
         <label for="reg-phone">Phone Number</label>
         <input id="reg-phone" type="tel" name="phone">
+      </div>
+
+      <div class="regFormGroup">
+        <label for="reg-password">Password</label>
+        <input id="reg-password" type="password" name="password">
       </div>
 
       <button type="submit" class="regBtnSignup">Sign Up</button>
