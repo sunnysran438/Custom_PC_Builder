@@ -80,6 +80,7 @@ DROP TABLE IF EXISTS LIST_PART;
 DROP TABLE IF EXISTS SUPPLIER;
 DROP TABLE IF EXISTS MANUFACTURER;
 DROP TABLE IF EXISTS CUSTOMER;
+DROP TABLE IF EXISTS RATING;
 
 -- CREATE TABLES ###################################################################
 -- #################################################################################
@@ -147,9 +148,11 @@ CREATE TABLE COMPONENT(
 CREATE TABLE BUILD_LIST(
     list_number INTEGER NOT NULL,
     customer_id INTEGER NOT NULL,
+    build_name VARCHAR(127) DEFAULT 'My Build',
     CONSTRAINT pk PRIMARY KEY(list_number),
     FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
 );
+
 
 CREATE TABLE CONTAINS_COMPONENT(
     list_number INTEGER NOT NULL,
@@ -158,6 +161,15 @@ CREATE TABLE CONTAINS_COMPONENT(
     CONSTRAINT pk PRIMARY KEY(list_number, list_part_id),
     FOREIGN KEY (list_number) REFERENCES BUILD_LIST(list_number),
     FOREIGN KEY (list_part_id) REFERENCES LIST_PART(list_part_id)
+);
+
+CREATE TABLE RATING(
+    customer_id INTEGER NOT NULL,
+    list_part_id INTEGER NOT NULL,
+    rating INTEGER NOT NULL,
+    PRIMARY KEY(customer_id, list_part_id),
+    FOREIGN KEY(customer_id) REFERENCES CUSTOMER(customer_id),
+    FOREIGN KEY(list_part_id) REFERENCES LIST_PART(list_part_id)
 );
 
 -- Component Formats #################################################
@@ -533,7 +545,8 @@ INSERT INTO COMPONENT VALUES
 -- customer build list stuf ########################################################
 
 -- (listnumber, custid)
-INSERT INTO BUILD_LIST VALUES(1,1);
+INSERT INTO BUILD_LIST VALUES(1, 1, 'Art''s Build');
+
 
 -- (listnumber, custid, listpartid, num_comps)
 INSERT INTO CONTAINS_COMPONENT VALUES(1, 1, 3);
@@ -1247,6 +1260,115 @@ def delete_store_item(item_number : int) -> bool:
 
     return True
 
+
+def get_store_components(filter_type='', filter_manufacturer='', filter_supplier='', filter_availability='', filter_price='', filter_rating=''):
+    """Get all store items with component details and filters"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    query_string = """
+        SELECT si.item_number, si.price, si.list_part_id, si.availability,
+               s.supplier_name, s.supplier_id,
+               c.manufacturer_id, m.manufacturer_name,
+               COALESCE(cpu.product_name, gpu.product_name, mb.product_name,
+                        ram.product_name, sto.product_name, psu.product_name,
+                        pc.product_name, fan.product_name, cool.product_name,
+                        eth.product_name, wifi.product_name) as product_name,
+               CASE
+                   WHEN cpu.list_part_id IS NOT NULL THEN 'CPU'
+                   WHEN gpu.list_part_id IS NOT NULL THEN 'GPU'
+                   WHEN mb.list_part_id IS NOT NULL THEN 'Motherboard'
+                   WHEN ram.list_part_id IS NOT NULL THEN 'RAM'
+                   WHEN sto.list_part_id IS NOT NULL THEN 'Storage'
+                   WHEN psu.list_part_id IS NOT NULL THEN 'Power Supply'
+                   WHEN pc.list_part_id IS NOT NULL THEN 'Case'
+                   WHEN fan.list_part_id IS NOT NULL THEN 'Fan'
+                   WHEN cool.list_part_id IS NOT NULL THEN 'CPU Cooler'
+                   WHEN eth.list_part_id IS NOT NULL THEN 'Ethernet Controller'
+                   WHEN wifi.list_part_id IS NOT NULL THEN 'Wifi Module'
+                   ELSE 'Unknown'
+               END as component_type
+        FROM STORE_ITEM si
+        JOIN SUPPLIER s ON si.supplier_id = s.supplier_id
+        JOIN COMPONENT c ON si.list_part_id = c.list_part_id
+        JOIN MANUFACTURER m ON c.manufacturer_id = m.manufacturer_id
+        LEFT JOIN CPU cpu ON c.list_part_id = cpu.list_part_id
+        LEFT JOIN GPU gpu ON c.list_part_id = gpu.list_part_id
+        LEFT JOIN MOTHERBOARD mb ON c.list_part_id = mb.list_part_id
+        LEFT JOIN RAM ram ON c.list_part_id = ram.list_part_id
+        LEFT JOIN STORAGE sto ON c.list_part_id = sto.list_part_id
+        LEFT JOIN POWER_SUPPLY_UNIT psu ON c.list_part_id = psu.list_part_id
+        LEFT JOIN PC_CASE pc ON c.list_part_id = pc.list_part_id
+        LEFT JOIN FAN fan ON c.list_part_id = fan.list_part_id
+        LEFT JOIN CPU_COOLER cool ON c.list_part_id = cool.list_part_id
+        LEFT JOIN ETHERNET_CONTROLLER eth ON c.list_part_id = eth.list_part_id
+        LEFT JOIN WIFI_MODULE wifi ON c.list_part_id = wifi.list_part_id
+    """
+
+  
+
+    try:
+        cursor.execute(query_string)
+        results = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return []
+    
+
+
+    components = []
+    for row in results:
+        price = row[1]
+        availability = row[3] if row[3] else 'In stock'
+        component_type = row[9]
+        manufacturer_id = row[6]
+        supplier_id = row[5]
+        product_name = row[8]
+
+        cursor.execute(f"SELECT AVG(rating) FROM RATING WHERE list_part_id = {row[2]}")
+        rating_row = cursor.fetchone()
+        rating = int(rating_row[0]) if rating_row[0] else 0
+        
+     
+
+        if not product_name:
+            continue
+
+        if filter_type and component_type != filter_type:
+            continue
+        if filter_manufacturer and str(manufacturer_id) != str(filter_manufacturer):
+            continue
+        if filter_supplier and str(supplier_id) != str(filter_supplier):
+            continue
+        if filter_availability and availability != filter_availability:
+            continue
+        if filter_price:
+            parts = filter_price.split('-')
+            min_price = float(parts[0])
+            max_price = float(parts[1])
+            if price < min_price or price > max_price:
+                continue
+        if filter_rating:
+            if rating < int(filter_rating):
+                continue
+
+        components.append({
+            'item_number': row[0],
+            'price': price,
+            'list_part_id': row[2],
+            'availability': availability,
+            'supplier_name': row[4],
+            'supplier_id': supplier_id,
+            'manufacturer_name': row[7],
+            'product_name': product_name,
+            'component_type': component_type,
+            'rating': rating,
+        })
+    conn.close()
+
+    return components
+
 def get_all_components(filter_type='', filter_manufacturer='', supplier_id=None):
     """Get all components with optional filters, marks if already in supplier inventory"""
     conn = sqlite3.connect("parts_picker.db")
@@ -1415,7 +1537,189 @@ def update_store_item(item_number, price, units_sold, availability):
     conn.close()
     return True
 
+def get_component_detail(list_part_id):
+    """Get full details for a component including store info"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
 
+    query_string = f"""
+        SELECT si.item_number, si.price, si.list_part_id, si.availability,
+               s.supplier_name,
+               c.manufacturer_id, m.manufacturer_name,
+               COALESCE(cpu.product_name, gpu.product_name, mb.product_name,
+                        ram.product_name, sto.product_name, psu.product_name,
+                        pc.product_name, fan.product_name, cool.product_name,
+                        eth.product_name, wifi.product_name) as product_name,
+               CASE
+                   WHEN cpu.list_part_id IS NOT NULL THEN 'CPU'
+                   WHEN gpu.list_part_id IS NOT NULL THEN 'GPU'
+                   WHEN mb.list_part_id IS NOT NULL THEN 'Motherboard'
+                   WHEN ram.list_part_id IS NOT NULL THEN 'RAM'
+                   WHEN sto.list_part_id IS NOT NULL THEN 'Storage'
+                   WHEN psu.list_part_id IS NOT NULL THEN 'Power Supply'
+                   WHEN pc.list_part_id IS NOT NULL THEN 'Case'
+                   WHEN fan.list_part_id IS NOT NULL THEN 'Fan'
+                   WHEN cool.list_part_id IS NOT NULL THEN 'CPU Cooler'
+                   WHEN eth.list_part_id IS NOT NULL THEN 'Ethernet Controller'
+                   WHEN wifi.list_part_id IS NOT NULL THEN 'Wifi Module'
+                   ELSE 'Unknown'
+               END as component_type
+        FROM STORE_ITEM si
+        JOIN SUPPLIER s ON si.supplier_id = s.supplier_id
+        JOIN COMPONENT c ON si.list_part_id = c.list_part_id
+        JOIN MANUFACTURER m ON c.manufacturer_id = m.manufacturer_id
+        LEFT JOIN CPU cpu ON c.list_part_id = cpu.list_part_id
+        LEFT JOIN GPU gpu ON c.list_part_id = gpu.list_part_id
+        LEFT JOIN MOTHERBOARD mb ON c.list_part_id = mb.list_part_id
+        LEFT JOIN RAM ram ON c.list_part_id = ram.list_part_id
+        LEFT JOIN STORAGE sto ON c.list_part_id = sto.list_part_id
+        LEFT JOIN POWER_SUPPLY_UNIT psu ON c.list_part_id = psu.list_part_id
+        LEFT JOIN PC_CASE pc ON c.list_part_id = pc.list_part_id
+        LEFT JOIN FAN fan ON c.list_part_id = fan.list_part_id
+        LEFT JOIN CPU_COOLER cool ON c.list_part_id = cool.list_part_id
+        LEFT JOIN ETHERNET_CONTROLLER eth ON c.list_part_id = eth.list_part_id
+        LEFT JOIN WIFI_MODULE wifi ON c.list_part_id = wifi.list_part_id
+        WHERE si.list_part_id = {list_part_id}
+        LIMIT 1
+    """
+
+    try:
+        cursor.execute(query_string)
+        row = cursor.fetchone()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return None
+
+    if not row:
+        conn.close()
+        return None
+
+    # Get average rating
+    cursor.execute(f"SELECT AVG(rating), COUNT(rating) FROM RATING WHERE list_part_id = {list_part_id}")
+    rating_row = cursor.fetchone()
+    avg_rating = int(rating_row[0]) if rating_row[0] else 0
+    num_ratings = rating_row[1] if rating_row[1] else 0
+
+    conn.close()
+
+    return {
+        'item_number': row[0],
+        'price': row[1],
+        'list_part_id': row[2],
+        'availability': row[3] if row[3] else 'In stock',
+        'supplier_name': row[4],
+        'manufacturer_name': row[6],
+        'product_name': row[7],
+        'component_type': row[8],
+        'avg_rating': avg_rating,
+        'num_ratings': num_ratings,
+    }
+
+
+def get_component_specs(list_part_id):
+    """Get specifications for a component"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    specs = []
+
+    tables = {
+        'CPU': ['product_name', 'chip_family', 'series', 'TDP', 'base_clock', 'boost_clock', 'l1_cache', 'l2_cache', 'l3_cache', 'num_cores', 'num_threads', 'architecture', 'socket_type', 'ram_type'],
+        'GPU': ['product_name', 'series', 'architecture', 'base_clock', 'boost_clock', 'memory_size', 'memory_type', 'num_cores', 'power_consumption', 'pci_type_id'],
+        'MOTHERBOARD': ['product_name', 'num_ram_slots', 'chipset_name', 'num_SATA_connectors', 'num_cooler_headers', 'num_fan_headers', 'form_factor', 'socket_type', 'ram_type'],
+        'RAM': ['product_name', 'capacity', 'max_freq', 'ram_type'],
+        'STORAGE': ['product_name', 'capacity', 'read_speed', 'write_speed', 'form_factor'],
+        'POWER_SUPPLY_UNIT': ['product_name', 'power_rating', 'modular', 'length_mm'],
+        'PC_CASE': ['product_name', 'height', 'width', 'len_case', 'material', 'num_35_bays', 'num_25_bays', 'max_gpu_len_mm', 'max_psu_len_mm', 'max_air_cooler_height'],
+        'FAN': ['product_name', 'fan_rpm', 'noise_level', 'size_category_mm'],
+        'CPU_COOLER': ['product_name', 'nosie_level'],
+        'ETHERNET_CONTROLLER': ['product_name'],
+        'WIFI_MODULE': ['product_name', 'pci_type_id'],
+    }
+
+    labels = {
+        'chip_family': 'Chip Family', 'series': 'Series', 'TDP': 'TDP (W)',
+        'base_clock': 'Base Clock (MHz)', 'boost_clock': 'Boost Clock (MHz)',
+        'l1_cache': 'L1 Cache (KB)', 'l2_cache': 'L2 Cache (MB)', 'l3_cache': 'L3 Cache (MB)',
+        'num_cores': 'Number of Cores', 'num_threads': 'Number of Threads',
+        'architecture': 'Architecture', 'socket_type': 'Socket Type', 'ram_type': 'RAM Type',
+        'memory_size': 'Memory Size (GB)', 'memory_type': 'Memory Type',
+        'power_consumption': 'Power Consumption (W)', 'pci_type_id': 'PCIe Slot',
+        'num_ram_slots': 'RAM Slots', 'chipset_name': 'Chipset',
+        'num_SATA_connectors': 'SATA Connectors', 'num_cooler_headers': 'Cooler Headers',
+        'num_fan_headers': 'Fan Headers', 'form_factor': 'Form Factor',
+        'capacity': 'Capacity (GB)', 'max_freq': 'Max Frequency (MHz)',
+        'read_speed': 'Read Speed (MB/s)', 'write_speed': 'Write Speed (MB/s)',
+        'power_rating': 'Power Rating (W)', 'modular': 'Modular', 'length_mm': 'Length (mm)',
+        'height': 'Height (mm)', 'width': 'Width (mm)', 'len_case': 'Length (mm)',
+        'material': 'Material', 'num_35_bays': '3.5" Drive Bays', 'num_25_bays': '2.5" Drive Bays',
+        'max_gpu_len_mm': 'Max GPU Length (mm)', 'max_psu_len_mm': 'Max PSU Length (mm)',
+        'max_air_cooler_height': 'Max Cooler Height (mm)',
+        'fan_rpm': 'Fan RPM', 'noise_level': 'Noise Level (dBA)', 'nosie_level': 'Noise Level (dBA)',
+        'size_category_mm': 'Fan Size (mm)',
+    }
+
+    for table, columns in tables.items():
+        try:
+            cursor.execute(f"SELECT * FROM {table} WHERE list_part_id = {list_part_id}")
+            row = cursor.fetchone()
+            if row:
+                cursor.execute(f"PRAGMA table_info({table})")
+                col_names = [col[1] for col in cursor.fetchall()]
+                for idx, col_name in enumerate(col_names):
+                    if col_name == 'list_part_id' or col_name == 'product_name':
+                        continue
+                    if row[idx] is not None:
+                        label = labels.get(col_name, col_name)
+                        specs.append({'label': label, 'value': row[idx]})
+                conn.close()
+                return specs
+        except sqlite3.Error as e:
+            continue
+
+    conn.close()
+    return specs
+
+
+def add_rating(customer_id, list_part_id, rating):
+    """Add or update a customer rating for a component"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT * FROM RATING WHERE customer_id = ? AND list_part_id = ?", (customer_id, list_part_id))
+        existing = cursor.fetchone()
+
+        if existing:
+            cursor.execute("UPDATE RATING SET rating = ? WHERE customer_id = ? AND list_part_id = ?", (rating, customer_id, list_part_id))
+        else:
+            cursor.execute("INSERT INTO RATING VALUES (?, ?, ?)", (customer_id, list_part_id, rating))
+
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return False
+
+    conn.close()
+    return True
+
+
+def get_user_rating(customer_id, list_part_id):
+    """Get a customer's rating for a specific component"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT rating FROM RATING WHERE customer_id = ? AND list_part_id = ?", (customer_id, list_part_id))
+        row = cursor.fetchone()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return None
+
+    conn.close()
+    return row[0] if row else None
 
 # CUSTOMER STUFF###############################################################################################################################
 # #################################################################################################################################################
@@ -1433,6 +1737,7 @@ def get_customers():
     results = cursor.fetchall()
     conn.close()
     return results
+
 def add_customer(email, first_name, last_name, street, city, province, postal_code, country, phone, password):
     """Add a customer to table 'CUSTOMER' returns true on success"""
     # open the database
@@ -1529,89 +1834,70 @@ def get_customer_by_email(email, password):
     else:
         return None
 
-def create_build_list(customer_id:int)->bool:
-    """add a build list to 'BUILD_LIST' returns true on success"""
-    # open the database
+def get_customer_builds(customer_id):
+    """Get all build lists for a customer"""
     conn = sqlite3.connect("parts_picker.db")
     cursor = conn.cursor()
 
-    # ensure that the customer_id corresponds to an actual customer
-    query_string = f"SELECT * FROM CUSTOMER WHERE customer_id = {customer_id}"
     try:
-        cursor.execute(query_string)
+        cursor.execute(f"SELECT list_number, customer_id, build_name FROM BUILD_LIST WHERE customer_id = {customer_id}")
         results = cursor.fetchall()
     except sqlite3.Error as e:
         print(f"query error: {e}")
         conn.close()
-        return False
-    
-    if len(results) == 0:
-        conn.close()
-        print(("customer_id does not correspond to an available customer %d" % (customer_id)))
-        return False
-    
-    # the customer does exist so add a new build list
-    # first get highest id number of the existing customer
-    query_string = f"SELECT MAX(list_number) FROM BUILD_LIST"
-    try:
-        cursor.execute(query_string)
-        results = cursor.fetchall()
-    except sqlite3.Error as e:
-        print(f"query error: {e}")
-        conn.close()
-        return False
+        return []
 
-    # get the current max, check if it is null 
-    current_max = results[0][0]
-    if current_max == None:
-        current_max = -1
-    # increment the current max to get the next id
-    new_id = current_max + 1
-    
-    # command for adding the new build list
-    query_string = f"INSERT INTO BUILD_LIST VALUES ({new_id},{customer_id})"
-    try:
-        cursor.execute(query_string)
-        results = cursor.fetchall()
-    except sqlite3.Error as e:
-        print(f"query error: {e}")
-        conn.close()
-        return False
-    
-    conn.commit()
     conn.close()
 
-    return True
+    builds = []
+    for row in results:
+        builds.append({
+            'list_number': row[0],
+            'customer_id': row[1],
+            'name': row[2] if row[2] else 'Unnamed Build',
+        })
+    return builds
 
-def delete_build_list(list_id:int)->bool:
-    """Delete a build list from table 'BUILD_LIST' and any related list"""
-    # open the database
+
+def create_build_list(customer_id, build_name):
+    """Create a new build list for a customer"""
     conn = sqlite3.connect("parts_picker.db")
     cursor = conn.cursor()
-    
-    # command for deleting the build list
-    query_string = f"DELETE FROM BUILD_LIST WHERE list_number={list_id}"
-    try:
-        cursor.execute(query_string)
-    except sqlite3.Error as e:
-        print(f"query error: {e}")
-        conn.close()
-        return False
-    
-    # delete from the contains component table
-    # command for deleting the customer
-    query_string = f"DELETE FROM CONTAINS_COMPONENT WHERE list_number={list_id}"
-    try:
-        cursor.execute(query_string)
-    except sqlite3.Error as e:
-        print(f"query error: {e}")
-        conn.close()
-        return False
-    
-    conn.commit()
-    conn.close()
 
+    try:
+        cursor.execute("SELECT MAX(list_number) FROM BUILD_LIST")
+        max_id = cursor.fetchone()[0]
+        new_id = (max_id or 0) + 1
+
+        cursor.execute("INSERT INTO BUILD_LIST VALUES (?, ?, ?)", (new_id, customer_id, build_name))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return None
+
+    conn.close()
+    return new_id
+
+
+def delete_build_list(list_number):
+    """Delete a build list and its components"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(f"DELETE FROM CONTAINS_COMPONENT WHERE list_number = {list_number}")
+        cursor.execute(f"DELETE FROM BUILD_LIST WHERE list_number = {list_number}")
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return False
+
+    conn.close()
     return True
+
+
 
 def add_to_build_list(list_id:int, list_part_id:int, num_comps:int)->bool:
     """add a list part to a build list, modifies table 'CONTAINS_COMPONENT' returns true on success"""
@@ -2613,72 +2899,365 @@ def list_all_parts_of_type(part_type:str):
     conn.close()
     return results
 
+def get_build_name(list_number):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"SELECT build_name FROM BUILD_LIST WHERE list_number = {list_number}")
+        row = cursor.fetchone()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return 'My Build'
+    conn.close()
+    return row[0] if row and row[0] else 'My Build'
 
-def get_compatible_part(build_list:int, customer_id:int, part_type:str):
-    """returns all components of type 'part_type' that are compatible with all components in the give build list"""
+def get_compatible_part(build_list, customer_id, part_type):
+    """returns all components of type 'part_type' that are compatible with all components in the given build list"""
 
-    res = []
-    if part_type == "POWER_SUPPLY_UNIT":
-        # check case compatibility
-        res = []
-    elif part_type == "CASE":
-        # check compatibility with:
-        # motherboard,
-        # gpu,
-        # psu,
-        # fans,
-        # air cooler,
-        # liquid cooler,
-        res = []
-
-    elif part_type == "CPU_COOLER":
-        # check compatibility with:
-        # case
-        res = []
-
-    elif part_type == "GPU":
-        # check compatibility with:
-        # case
-        res = []
-
-    elif part_type == "CPU":
-        # check compatibility with:
-        # motherboard,
-        # ram
-        res = []
-
-    elif part_type == "FAN":
-        # check compatibility with:
-        # case
-        res = []
-
-    elif part_type == "RAM":
-        # check compatibility with:
-        # motherboard
-        # cpu
-        res = []
-
-    elif part_type == "STORAGE":
-        # check compatility with 
-        # motherboard
-        res = []
-
-    else:
-        res = []
-
-    # open the database
     conn = sqlite3.connect("parts_picker.db")
     cursor = conn.cursor()
 
+    # Get all components currently in the build list
+    cursor.execute(f"SELECT list_part_id FROM CONTAINS_COMPONENT WHERE list_number = {build_list}")
+    build_parts = [row[0] for row in cursor.fetchall()]
 
-    query_string = f"SELECT * FROM {part_type}"
-    try:
-        cursor.execute(query_string)
+    # Get current build components by type
+    build_cpu = None
+    build_motherboard = None
+    build_case = None
+    build_ram = None
+
+    for part_id in build_parts:
+        
+        cursor.execute(f"SELECT * FROM CPU WHERE list_part_id = {part_id}")
+        row = cursor.fetchone()
+        
+        if row:
+            build_cpu = row
+            continue
+
+        cursor.execute(f"SELECT * FROM MOTHERBOARD WHERE list_part_id = {part_id}")
+        row = cursor.fetchone()
+        
+        if row:
+            build_motherboard = row
+            continue
+
+        cursor.execute(f"SELECT * FROM PC_CASE WHERE list_part_id = {part_id}")
+        row = cursor.fetchone()
+        
+        if row:
+            build_case = row
+            continue
+
+        cursor.execute(f"SELECT * FROM RAM WHERE list_part_id = {part_id}")
+        row = cursor.fetchone()
+        
+        if row:
+            build_ram = row
+            continue
+
+    results = []
+
+    if part_type == "CPU":
+        
+        cursor.execute("SELECT * FROM CPU")
+        all_cpus = cursor.fetchall()
+        
+        for cpu in all_cpus:
+            
+            compatible = True
+            # Check motherboard socket compatibility
+            
+            if build_motherboard:
+                if cpu[13] != build_motherboard[8]:  # socket_type
+                    compatible = False
+                if cpu[14] != build_motherboard[9]:  # ram_type
+                    compatible = False
+            
+            # Check RAM compatibility
+            if build_ram:
+                if cpu[14] != build_ram[4]:  # ram_type
+                    compatible = False
+            
+            if compatible:
+                results.append(cpu)
+
+    elif part_type == "MOTHERBOARD":
+        cursor.execute("SELECT * FROM MOTHERBOARD")
+        all_mb = cursor.fetchall()
+        
+        for mb in all_mb:
+            
+            compatible = True
+            # Check CPU socket compatibility
+            
+            if build_cpu:
+                if mb[8] != build_cpu[13]:  # socket_type
+                    compatible = False
+                if mb[9] != build_cpu[14]:  # ram_type
+                    compatible = False
+            # Check RAM compatibility
+           
+            if build_ram:
+                if mb[9] != build_ram[4]:  # ram_type
+                    compatible = False
+            # Check case form factor compatibility
+            
+            if build_case:
+                cursor.execute(f"SELECT * FROM CASE_FORM_FACTOR_COMPATIBLE WHERE list_part_id = {build_case[0]} AND form_factor = '{mb[7]}'")
+                if not cursor.fetchone():
+                    compatible = False
+            
+            if compatible:
+                results.append(mb)
+
+    elif part_type == "RAM":
+        cursor.execute("SELECT * FROM RAM")
+        all_ram = cursor.fetchall()
+        
+        for ram in all_ram:
+            compatible = True
+            # Check motherboard RAM type
+            if build_motherboard:
+                if ram[4] != build_motherboard[9]:  # ram_type
+                    compatible = False
+                # Check capacity doesn't exceed max slots
+            # Check CPU RAM type
+            if build_cpu:
+                if ram[4] != build_cpu[14]:  # ram_type
+                    compatible = False
+            if compatible:
+                results.append(ram)
+
+    elif part_type == "GPU":
+        cursor.execute("SELECT * FROM GPU")
+        all_gpu = cursor.fetchall()
+        
+        for gpu in all_gpu:
+            compatible = True
+            # Check case max GPU length
+            if build_case:
+                if build_case[8] and gpu[8]:  # max_gpu_len_mm vs power_consumption (need length)
+                    pass  # GPU table doesn't store length, skip for now
+            # Check motherboard PCI slot compatibility
+            if build_motherboard:
+                cursor.execute(f"SELECT * FROM MOTHERBOARD_PCI_SLOT WHERE list_part_id = {build_motherboard[0]} AND pci_type_id = {gpu[10]}")
+                if not cursor.fetchone():
+                    compatible = False
+            if compatible:
+                results.append(gpu)
+
+    elif part_type == "POWER_SUPPLY_UNIT":
+        cursor.execute("SELECT * FROM POWER_SUPPLY_UNIT")
+        all_psu = cursor.fetchall()
+        
+        for psu in all_psu:
+            compatible = True
+            # Check case max PSU length
+            if build_case:
+                if build_case[9] and psu[4]:  # max_psu_len_mm vs length_mm
+                    if psu[4] > build_case[9]:
+                        compatible = False
+            if compatible:
+                results.append(psu)
+
+    elif part_type == "PC_CASE":
+        cursor.execute("SELECT * FROM PC_CASE")
+        all_cases = cursor.fetchall()
+        
+        for case in all_cases:
+            compatible = True
+            # Check motherboard form factor
+            if build_motherboard:
+                cursor.execute(f"SELECT * FROM CASE_FORM_FACTOR_COMPATIBLE WHERE list_part_id = {case[0]} AND form_factor = '{build_motherboard[7]}'")
+                if not cursor.fetchone():
+                    compatible = False
+            if compatible:
+                results.append(case)
+
+    elif part_type == "CPU_COOLER":
+        cursor.execute("SELECT * FROM CPU_COOLER")
+        all_coolers = cursor.fetchall()
+        
+        for cooler in all_coolers:
+            compatible = True
+            # Check air cooler height vs case
+            if build_case:
+                cursor.execute(f"SELECT * FROM AIR_COOLER WHERE list_part_id = {cooler[0]}")
+                air = cursor.fetchone()
+                if air and build_case[10]:  # max_air_cooler_height
+                    if air[2] and air[2] > build_case[10]:  # height
+                        compatible = False
+            if compatible:
+                results.append(cooler)
+
+    elif part_type == "FAN":
+        cursor.execute("SELECT * FROM FAN")
+        all_fans = cursor.fetchall()
+        
+        for fan in all_fans:
+            compatible = True
+            # Check case fan size compatibility
+            
+            if build_case:
+                cursor.execute(f"SELECT * FROM CASE_FAN_SIZE_COMPATIBLE WHERE list_part_id = {build_case[0]} AND size_category_mm = {fan[4]}")
+                if not cursor.fetchone():
+                    compatible = False
+            if compatible:
+                results.append(fan)
+
+    elif part_type == "STORAGE":
+        
+        cursor.execute("SELECT * FROM STORAGE")
+        all_storage = cursor.fetchall()
+        
+        for storage in all_storage:
+            
+            compatible = True
+            # Check M.2 storage PCI compatibility with motherboard
+            cursor.execute(f"SELECT * FROM M2_STORAGE WHERE list_part_id = {storage[0]}")
+            m2 = cursor.fetchone()
+            
+            if m2 and build_motherboard:
+                cursor.execute(f"SELECT * FROM MOTHERBOARD_PCI_SLOT WHERE list_part_id = {build_motherboard[0]} AND pci_type_id = {m2[1]}")
+                if not cursor.fetchone():
+                    compatible = False
+            # Check SATA storage with motherboard SATA connectors
+            cursor.execute(f"SELECT * FROM SATA_STORAGE WHERE list_part_id = {storage[0]}")
+            sata = cursor.fetchone()
+            
+            if sata and build_motherboard:
+                if build_motherboard[4] and build_motherboard[4] <= 0:  # num_SATA_connectors
+                    compatible = False
+            if compatible:
+                results.append(storage)
+
+    elif part_type == "WIFI_MODULE":
+        
+        cursor.execute("SELECT * FROM WIFI_MODULE")
+        all_wifi = cursor.fetchall()
+        for wifi in all_wifi:
+            compatible = True
+            if build_motherboard:
+                cursor.execute(f"SELECT * FROM MOTHERBOARD_PCI_SLOT WHERE list_part_id = {build_motherboard[0]} AND pci_type_id = {wifi[2]}")
+                if not cursor.fetchone():
+                    compatible = False
+            if compatible:
+                results.append(wifi)
+
+    else:
+       
+        cursor.execute(f"SELECT * FROM {part_type}")
         results = cursor.fetchall()
+
+    conn.close()
+    return results
+
+def get_build_components(list_number):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"SELECT list_part_id, num_components FROM CONTAINS_COMPONENT WHERE list_number = {list_number}")
+        build_parts = cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return []
+
+    tables = {
+        'CPU': 'CPU', 'GPU': 'GPU', 'MOTHERBOARD': 'Motherboard',
+        'RAM': 'RAM', 'STORAGE': 'Storage', 'POWER_SUPPLY_UNIT': 'Power Supply',
+        'PC_CASE': 'Case', 'FAN': 'Fan', 'CPU_COOLER': 'CPU Cooler',
+        'ETHERNET_CONTROLLER': 'Ethernet Controller', 'WIFI_MODULE': 'Wifi Module'
+    }
+
+    components = []
+    for part in build_parts:
+        list_part_id = part[0]
+        product_name = None
+        component_type = None
+
+        for table, type_name in tables.items():
+            cursor.execute(f"SELECT product_name FROM {table} WHERE list_part_id = {list_part_id}")
+            row = cursor.fetchone()
+            if row:
+                product_name = row[0]
+                component_type = type_name
+                break
+
+        price = 0
+        availability = 'Unknown'
+        supplier_name = 'N/A'
+
+        cursor.execute(f"""
+            SELECT si.price, si.availability, s.supplier_name
+            FROM STORE_ITEM si
+            JOIN SUPPLIER s ON si.supplier_id = s.supplier_id
+            WHERE si.list_part_id = {list_part_id}
+            LIMIT 1
+        """)
+        store_row = cursor.fetchone()
+        if store_row:
+            price = store_row[0]
+            availability = store_row[1] if store_row[1] else 'In stock'
+            supplier_name = store_row[2]
+
+        if product_name:
+            components.append({
+                'list_part_id': list_part_id,
+                'product_name': product_name,
+                'component_type': component_type,
+                'price': price,
+                'availability': availability,
+                'supplier_name': supplier_name,
+            })
+
+    conn.close()
+    return components
+
+
+def remove_from_build(list_number, list_part_id):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"DELETE FROM CONTAINS_COMPONENT WHERE list_number = {list_number} AND list_part_id = {list_part_id}")
+        conn.commit()
     except sqlite3.Error as e:
         print(f"query error: {e}")
         conn.close()
         return False
+    conn.close()
+    return True
+
+
+def get_compatible_store_items(list_number, customer_id, part_type):
+    compatible_parts = get_compatible_part(list_number, customer_id, part_type)
+    if not compatible_parts:
+        return []
+
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    results = []
+    for part in compatible_parts:
+        list_part_id = part[0]
+        cursor.execute(f"""
+            SELECT si.price, si.availability, s.supplier_name, si.list_part_id
+            FROM STORE_ITEM si
+            JOIN SUPPLIER s ON si.supplier_id = s.supplier_id
+            WHERE si.list_part_id = {list_part_id}
+        """)
+        store_rows = cursor.fetchall()
+        for store_row in store_rows:
+            results.append({
+                'list_part_id': store_row[3],
+                'product_name': part[1],
+                'price': store_row[0],
+                'availability': store_row[1] if store_row[1] else 'In stock',
+                'supplier_name': store_row[2],
+            })
 
     conn.close()
     return results

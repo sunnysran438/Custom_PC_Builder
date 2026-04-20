@@ -2,13 +2,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Builder - PC Component Builder{% endblock %}
+{% block title %}{{ build_name }} - PC Component Builder{% endblock %}
 
 {% block content %}
-
-
 <section class="buildSection">
-  <h1>PC Build</h1>
+  <h1>{{ build_name }}</h1>
 
   <!-- Header -->
   <div class="buildTableHeader">
@@ -16,178 +14,64 @@
     <div class="buildColSelection">Selection</div>
     <div class="buildColPrice">Price</div>
     <div class="buildColAvailability">Availability</div>
-    <div class="buildColLocation">Location</div>
+    <div class="buildColLocation">Supplier</div>
     <div class="buildColActions"></div>
   </div>
 
-  <!-- CPU -->
-  <div class="buildRowSelected">
-    <div class="buildColComponent">CPU</div>
-    <div class="buildColSelection">
-      <img class="buildProductImage" src="images/cpu1.jpg">
-      <span class="buildProductName">AMD Ryzen 7 5800X</span>
+  {% for slot in slots %}
+    {% if slot.selected %}
+    <!-- Selected Component -->
+    
+    <div class="buildRowSelected">
+     
+      <div class="buildColComponent">{{ slot.display_name }}</div>
+      <div class="buildColSelection">
+        <span class="buildProductName">{{ slot.product_name }}</span>
+      </div>
+      <div class="buildColPrice">${{ slot.price }}</div>
+      <div class="buildColAvailability">{{ slot.availability }}</div>
+      <div class="buildColLocation">{{ slot.supplier_name }}</div>
+      <div class="buildColActions">
+        <form method="post" action="{% url 'builder_remove' list_number slot.list_part_id %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="buildBtnRemove">✕</button>
+        
+        </form>
+      </div>
     </div>
-    <div class="buildColPrice">425.71</div>
-    <div class="buildColAvailability">In stock</div>
-    <div class="buildColLocation">Amazon</div>
-    <div class="buildColActions">
-      <button class="buildBtnBuy">Buy</button>
-      <button class="buildBtnRemove">✕</button>
+    
+    {% else %}
+    <!-- Empty Slot -->
+    <div class="buildRowEmpty">
+      
+      <div class="buildColComponent">{{ slot.display_name }}</div>
+      <div class="buildColSelection"></div>
+      <div class="buildColPrice"></div>
+      <div class="buildColAvailability"></div>
+      <div class="buildColLocation"></div>
+      <div class="buildColActions">
+        <a href="{% url 'builder_select_part' list_number slot.part_type %}">
+          <button class="buildBtnSelect">Select</button>
+        
+        </a>
+      </div>
     </div>
-  </div>
-
-  <!-- CPU Cooler -->
-  <div class="buildRowSelected">
-    <div class="buildColComponent">CPU Cooler</div>
-    <div class="buildColSelection">
-      <img class="buildProductImage" src="images/cpu_cooler.jpg">
-      <span class="buildProductName">CoolerMaster MasterLiquid 360L</span>
-    </div>
-    <div class="buildColPrice">113.71</div>
-    <div class="buildColAvailability">In stock</div>
-    <div class="buildColLocation">Amazon</div>
-    <div class="buildColActions">
-      <button class="buildBtnBuy">Buy</button>
-      <button class="buildBtnRemove">✕</button>
-    </div>
-  </div>
-
-  <!-- Motherboard -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Motherboard</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Memory -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Memory</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Storage -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Storage</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- GPU -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">GPU</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Case -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Case</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Power Supply -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Power Supply</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Operating System -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Operating System</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Monitor -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Monitor</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Expansion -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Expansion Cards/Networking</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Peripherals -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Peripherals</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
-
-  <!-- Accessories -->
-  <div class="buildRowEmpty">
-    <div class="buildColComponent">Accessories/Others</div>
-    <div class="buildColSelection"></div>
-    <div class="buildColActions">
-      <button class="buildBtnSelect">Select</button>
-    </div>
-  </div>
+    {% endif %}
+  {% endfor %}
 
   <!-- Total -->
   <div class="buildTotalRow">
+   
     <span class="buildTotalLabel">Total:</span>
-    <span class="buildTotalPrice">539.42</span>
-    <button class="buildBtnBuyBuild">Buy Build</button>
+    <span class="buildTotalPrice">${{ total_price }}</span>
+ 
+  </div>
+
+  <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+    <a href="{% url 'builder' %}">
+      <button class="mfrViewAddBtn" style="width: 120px; height: 40px; font-size: 15px;">Save Build</button>
+    </a>
   </div>
 
 </section>
 {% endblock %}
-
-
-<!-- ✅ REMOVE BUTTON SCRIPT -->
-{% block scripts %}
-<script>
-document.addEventListener("click", function (e) {
-
-  if (e.target.classList.contains("buildBtnRemove")) {
-
-    const row = e.target.closest(".buildRowSelected");
-    const component = row.querySelector(".buildColComponent").innerText;
-
-    row.classList.remove("buildRowSelected");
-    row.classList.add("buildRowEmpty");
-
-    row.innerHTML = `
-      <div class="buildColComponent">${component}</div>
-      <div class="buildColSelection"></div>
-      <div class="buildColActions">
-        <button class="buildBtnSelect">Select</button>
-      </div>
-    `;
-  }
-
-});
-</script>
-{% endblock %}
-
-
-</body>
-</html>

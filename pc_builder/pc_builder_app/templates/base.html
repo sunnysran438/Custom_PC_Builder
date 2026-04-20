@@ -22,7 +22,7 @@
     </a>
 
  <ul class="navbarLinks">
-    <li><a href="{% url 'search' %}">View Components</a></li>
+    <li><a href="{% url 'customer_browse' %}">View Components</a></li>
 
     {% if user_type != 'manufacturer' and user_type != 'supplier' %}
       <li><a href="#">View Build List</a></li>
@@ -116,7 +116,7 @@
       <div class="footerColumn">
         <h4>Nav</h4>
         <ul>
-          <li><a href="{% url 'search' %}">View Components</a></li>
+          <li><a href="{% url 'customer_browse' %}">View Components</a></li>
           <li><a href="{% url 'builder' %}">View Build List</a></li>
           <li><a href="{% url 'builder' %}">Builder</a></li>
         </ul>

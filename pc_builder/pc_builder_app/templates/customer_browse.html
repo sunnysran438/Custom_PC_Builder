@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+ 
+{% block title %}Browse Components - PC Component Builder{% endblock %}
+ 
+{% block content %}
+<section class="custBrowseSection">
+  <h1>Browse Components</h1>
+ 
+  <!-- Filters -->
+  <div class="custBrowseFilters">
+    <form method="get" class="custBrowseFilterForm">
+      <div class="custBrowseFilterGroup">
+        <label>Component Type</label>
+        <select name="type" class="custBrowseSelect" onchange="this.form.submit()">
+          <option value="">All Types</option>
+          <option value="CPU" {% if selected_type == 'CPU' %}selected{% endif %}>CPU</option>
+          <option value="GPU" {% if selected_type == 'GPU' %}selected{% endif %}>GPU</option>
+          <option value="Motherboard" {% if selected_type == 'Motherboard' %}selected{% endif %}>Motherboard</option>
+          <option value="RAM" {% if selected_type == 'RAM' %}selected{% endif %}>RAM</option>
+          <option value="Storage" {% if selected_type == 'Storage' %}selected{% endif %}>Storage</option>
+          <option value="Power Supply" {% if selected_type == 'Power Supply' %}selected{% endif %}>Power Supply</option>
+          <option value="Case" {% if selected_type == 'Case' %}selected{% endif %}>Case</option>
+          <option value="CPU Cooler" {% if selected_type == 'CPU Cooler' %}selected{% endif %}>CPU Cooler</option>
+          <option value="Fan" {% if selected_type == 'Fan' %}selected{% endif %}>Fan</option>
+          <option value="Ethernet Controller" {% if selected_type == 'Ethernet Controller' %}selected{% endif %}>Ethernet Controller</option>
+          <option value="Wifi Module" {% if selected_type == 'Wifi Module' %}selected{% endif %}>Wifi Module</option>
+        </select>
+      </div>
+      <div class="custBrowseFilterGroup">
+        <label>Manufacturer</label>
+        <select name="manufacturer" class="custBrowseSelect" onchange="this.form.submit()">
+          <option value="">All Manufacturers</option>
+          {% for mfr in manufacturers %}
+            <option value="{{ mfr.0 }}" {% if selected_manufacturer == mfr.0|stringformat:"d" %}selected{% endif %}>{{ mfr.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="custBrowseFilterGroup">
+        <label>Supplier</label>
+        <select name="supplier" class="custBrowseSelect" onchange="this.form.submit()">
+          <option value="">All Suppliers</option>
+          {% for sup in suppliers %}
+            <option value="{{ sup.0 }}" {% if selected_supplier == sup.0|stringformat:"d" %}selected{% endif %}>{{ sup.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="custBrowseFilterGroup">
+        <label>Availability</label>
+        <select name="availability" class="custBrowseSelect" onchange="this.form.submit()">
+          <option value="">All</option>
+          <option value="In stock" {% if selected_availability == 'In stock' %}selected{% endif %}>In Stock</option>
+          <option value="out of stock" {% if selected_availability == 'out of stock' %}selected{% endif %}>Out of Stock</option>
+        </select>
+      </div>
+      <div class="custBrowseFilterGroup">
+        <label>Price</label>
+        <select name="price_range" class="custBrowseSelect" onchange="this.form.submit()">
+          <option value="">Any Price</option>
+          <option value="0-100" {% if selected_price == '0-100' %}selected{% endif %}>$0 - $100</option>
+          <option value="100-250" {% if selected_price == '100-250' %}selected{% endif %}>$100 - $250</option>
+          <option value="250-500" {% if selected_price == '250-500' %}selected{% endif %}>$250 - $500</option>
+          <option value="500-1000" {% if selected_price == '500-1000' %}selected{% endif %}>$500 - $1,000</option>
+          <option value="1000-9999" {% if selected_price == '1000-9999' %}selected{% endif %}>$1,000+</option>
+        </select>
+      </div>
+      <div class="custBrowseFilterGroup">
+        <label>Min Rating</label>
+        <select name="rating" class="custBrowseSelect" onchange="this.form.submit()">
+          <option value="">Any Rating</option>
+          <option value="4" {% if selected_rating == '4' %}selected{% endif %}>4+ Stars</option>
+          <option value="3" {% if selected_rating == '3' %}selected{% endif %}>3+ Stars</option>
+          <option value="2" {% if selected_rating == '2' %}selected{% endif %}>2+ Stars</option>
+          <option value="1" {% if selected_rating == '1' %}selected{% endif %}>1+ Stars</option>
+        </select>
+      </div>
+    </form>
+  </div>
+ 
+  <!-- Table Header -->
+  <div class="custBrowseTableHeader">
+    <div class="custBrowseColName">Component Name</div>
+    <div class="custBrowseColType">Type</div>
+    <div class="custBrowseColSupplier">Supplier</div>
+    <div class="custBrowseColPrice">Price</div>
+    <div class="custBrowseColAvail">Availability</div>
+    <div class="custBrowseColRating">Rating</div>
+    <div class="custBrowseColActions">Actions</div>
+  </div>
+ 
+  {% if components %}
+    {% for item in components %}
+    <div class="custBrowseRow">
+      <div class="custBrowseColName">{{ item.product_name }}</div>
+      <div class="custBrowseColType">{{ item.component_type }}</div>
+      <div class="custBrowseColSupplier">{{ item.supplier_name }}</div>
+      <div class="custBrowseColPrice">${{ item.price }}</div>
+      <div class="custBrowseColAvail">
+        {% if item.availability == 'In stock' %}
+          <span class="custBrowseInStock">In Stock</span>
+        {% else %}
+          <span class="custBrowseOutStock">Out of Stock</span>
+        {% endif %}
+      </div>
+      <div class="custBrowseColRating">
+        <span class="custBrowseStars">
+          {% for i in "12345" %}
+            {% if forloop.counter <= item.rating %}
+              <span class="custBrowseStarFilled">★</span>
+            {% else %}
+              <span class="custBrowseStarEmpty">☆</span>
+            {% endif %}
+          {% endfor %}
+        </span>
+      </div>
+      <div class="custBrowseColActions">
+        <a href="{% url 'component_detail' item.list_part_id %}">
+          <button class="custBrowseBtnView">View</button>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="custBrowseRow">
+      <div class="custBrowseColName" style="color: #999;">No components found.</div>
+      <div class="custBrowseColType"></div>
+      <div class="custBrowseColSupplier"></div>
+      <div class="custBrowseColPrice"></div>
+      <div class="custBrowseColAvail"></div>
+      <div class="custBrowseColRating"></div>
+      <div class="custBrowseColActions"></div>
+    </div>
+  {% endif %}
+ 
+</section>
+{% endblock %}
+ 

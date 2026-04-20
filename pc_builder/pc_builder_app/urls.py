@@ -5,8 +5,11 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("login/", views.login, name="login"),
     path("register/", views.register, name="register"),
-    path("builder/", views.builder, name="builder"),
-    path("search/", views.search, name="search"),
+    path('builder/', views.builder, name='builder'),
+    path('builder/<int:list_number>/', views.builder_edit, name='builder_edit'),
+    path('builder/<int:list_number>/select/<str:part_type>/', views.builder_select_part, name='builder_select_part'),
+    path('builder/<int:list_number>/remove/<int:list_part_id>/', views.builder_remove, name='builder_remove'),
+    path('builder/delete/<int:list_number>/', views.builder_delete, name='builder_delete'),
 
     path("add/<int:component_id>/", views.add_component, name="add_component"),
     path("remove/<int:item_id>/", views.remove_component, name="remove_component"),
@@ -22,5 +25,9 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('my-components/', views.view_my_components, name='view_my_components'),
     path('delete-component/<int:part_id>/', views.delete_component, name='delete_component'),
+
+
+    path('browse/', views.customer_browse, name='customer_browse'),
+    path('component/<int:list_part_id>/', views.component_detail, name='component_detail'), 
 
 ]

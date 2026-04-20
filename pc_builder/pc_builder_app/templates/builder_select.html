@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Builder - PC Component Builder{% endblock %}
+
+{% block content %}
+<section class="loginSection">
+  
+    <div class="loginCard">
+    <h1 style="text-align: center;">PC Builder</h1>
+
+    {% if error %}
+      <p style="color: red; margin-bottom: 16px; text-align: center;">{{ error }}</p>
+    {% endif %}
+
+    {% if builds and builds|length > 0 %}
+    <!-- Existing Builds -->
+    <div class="builderSelectSection">
+    
+        <h3 class="builderSelectSubtitle">Your Build Lists</h3>
+      {% for build in builds %}
+      <div class="builderSelectRow">
+        <span class="builderSelectName">{{ build.name }}</span>
+        <div class="builderSelectRowActions">
+         
+            <a href="{% url 'builder_edit' build.list_number %}">
+            <button class="builderSelectBtnView">Open</button>
+          </a>
+          
+          <form method="post" action="{% url 'builder_delete' build.list_number %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="builderSelectBtnDelete">Delete</button>
+          </form>
+        </div>
+      
+    </div>
+      {% endfor %}
+    </div>
+
+    <div class="builderSelectDivider"></div>
+    {% else %}
+    <p style="text-align: center; color: #999; margin-bottom: 24px;">You have no build lists yet.</p>
+    {% endif %}
+
+    <!-- Create New Build -->
+    <h3 class="builderSelectSubtitle">Create New Build</h3>
+    
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create">
+      
+      <div class="formGroup">
+        <label for="build-name">Build Name</label>
+        <input id="build-name" type="text" name="build_name" placeholder="e.g. Dream Gaming PC">
+      </div>
+      
+      <div class="loginButtons">
+        <button type="submit" class="btnSignin">Create Build</button>
+      </div>
+    
+    </form>
+  
+</div>
+</section>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+ 
+{% block title %}{{ component.product_name }} - PC Component Builder{% endblock %}
+ 
+{% block content %}
+<section class="compDetailSection">
+ 
+  <a href="{% url 'customer_browse' %}" class="compDetailBack">‹ Back to Browse</a>
+ 
+  <div class="compDetailHeader">
+    
+    <div class="compDetailHeaderLeft">
+      <h1>{{ component.product_name }}</h1>
+      <span class="compDetailType">{{ component.component_type }}</span>
+    </div>
+    
+    <div class="compDetailHeaderRight">
+      
+        <div class="compDetailPrice">${{ component.price }}</div>
+      {% if component.availability == 'In stock' %}
+        <span class="compDetailInStock">In Stock</span>
+      {% else %}
+        <span class="compDetailOutStock">Out of Stock</span>
+      {% endif %}
+    
+    </div>
+  </div>
+ 
+  <div class="compDetailGrid">
+ 
+    <!-- Info Card -->
+    
+    <div class="compDetailCard">
+      <h3>Details</h3>
+      <div class="compDetailInfoRow">
+        <span class="compDetailLabel">Manufacturer</span>
+        <span class="compDetailValue">{{ component.manufacturer_name }}</span>
+      </div>
+      
+      <div class="compDetailInfoRow">
+        <span class="compDetailLabel">Supplier</span>
+        <span class="compDetailValue">{{ component.supplier_name }}</span>
+      </div>
+     
+      <div class="compDetailInfoRow">
+        <span class="compDetailLabel">Type</span>
+        <span class="compDetailValue">{{ component.component_type }}</span>
+      </div>
+      
+      <div class="compDetailInfoRow">
+        <span class="compDetailLabel">Price</span>
+        <span class="compDetailValue">${{ component.price }}</span>
+      </div>
+     
+      <div class="compDetailInfoRow">
+        <span class="compDetailLabel">Availability</span>
+        <span class="compDetailValue">{{ component.availability }}</span>
+      </div>
+      
+      <div class="compDetailInfoRow">
+        <span class="compDetailLabel">Rating</span>
+        <span class="compDetailValue">
+          {% for i in "12345" %}
+            {% if forloop.counter <= component.avg_rating %}
+              <span class="compDetailStarFilled">★</span>
+            {% else %}
+              <span class="compDetailStarEmpty">☆</span>
+            {% endif %}
+          {% endfor %}
+          <span class="compDetailRatingCount">({{ component.num_ratings }})</span>
+        
+        </span>
+      </div>
+    </div>
+ 
+    <!-- Specs Card -->
+    <div class="compDetailCard">
+      <h3>Specifications</h3>
+      {% if specs %}
+        {% for spec in specs %}
+        <div class="compDetailInfoRow">
+          <span class="compDetailLabel">{{ spec.label }}</span>
+          <span class="compDetailValue">{{ spec.value }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="color: #999;">No specifications available.</p>
+      {% endif %}
+    </div>
+ 
+  </div>
+ 
+  <!-- Rating Section -->
+  <div class="compDetailCard" style="margin-top: 24px;">
+    <h3>Rate this Component</h3>
+ 
+    {% if user_rating %}
+      <p>You rated this component: 
+        {% for i in "12345" %}
+          {% if forloop.counter <= user_rating %}
+            <span class="compDetailStarFilled">★</span>
+          {% else %}
+            <span class="compDetailStarEmpty">☆</span>
+          {% endif %}
+        {% endfor %}
+      </p>
+    {% endif %}
+ 
+    {% if error %}
+      <p style="color: red; margin-bottom: 12px;">{{ error }}</p>
+    {% endif %}
+ 
+    {% if success %}
+      <p style="color: #00b34a; margin-bottom: 12px;">{{ success }}</p>
+    {% endif %}
+ 
+    <form method="post" class="compDetailRatingForm">
+      {% csrf_token %}
+      <input type="hidden" name="list_part_id" value="{{ component.list_part_id }}">
+      <div class="compDetailStarSelect" id="starSelect">
+        <span class="compDetailStarBtn" data-value="1">☆</span>
+        <span class="compDetailStarBtn" data-value="2">☆</span>
+        <span class="compDetailStarBtn" data-value="3">☆</span>
+        <span class="compDetailStarBtn" data-value="4">☆</span>
+        <span class="compDetailStarBtn" data-value="5">☆</span>
+      </div>
+      <input type="hidden" name="rating" id="ratingInput" value="">
+      <button type="submit" class="compDetailSubmitBtn">Submit Rating</button>
+    </form>
+  </div>
+ 
+</section>
+{% endblock %}
+ 
+{% block scripts %}
+<script>
+ 
+ var starBtns = document.querySelectorAll('.compDetailStarBtn');
+  var ratingInput = document.getElementById('ratingInput');
+  var selectedRating = 0;
+ 
+  for (var i = 0; i < starBtns.length; i++) {
+    starBtns[i].addEventListener('click', function () {
+      selectedRating = parseInt(this.getAttribute('data-value'));
+      ratingInput.value = selectedRating;
+ 
+      for (var j = 0; j < starBtns.length; j++) {
+        if (parseInt(starBtns[j].getAttribute('data-value')) <= selectedRating) {
+          starBtns[j].textContent = '★';
+          starBtns[j].classList.add('compDetailStarFilled');
+          starBtns[j].classList.remove('compDetailStarEmpty');
+        } else {
+          starBtns[j].textContent = '☆';
+          starBtns[j].classList.add('compDetailStarEmpty');
+          starBtns[j].classList.remove('compDetailStarFilled');
+        }
+      }
+    });
+ 
+    starBtns[i].addEventListener('mouseenter', function () {
+      var hoverVal = parseInt(this.getAttribute('data-value'));
+      for (var j = 0; j < starBtns.length; j++) {
+        if (parseInt(starBtns[j].getAttribute('data-value')) <= hoverVal) {
+          starBtns[j].textContent = '★';
+        } else {
+          starBtns[j].textContent = '☆';
+        }
+      }
+    });
+ 
+    starBtns[i].addEventListener('mouseleave', function () {
+      for (var j = 0; j < starBtns.length; j++) {
+        if (parseInt(starBtns[j].getAttribute('data-value')) <= selectedRating) {
+          starBtns[j].textContent = '★';
+        } else {
+          starBtns[j].textContent = '☆';
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Select {{ part_type_display }} - PC Component Builder{% endblock %}
+
+{% block content %}
+<section class="builderPickSection">
+
+  <a href="{% url 'builder_edit' list_number %}" class="builderPickBack">‹ Back to Build</a>
+
+  <h1>Select {{ part_type_display }}</h1>
+  <p class="builderPickSubtitle">Showing only parts compatible with your current build.</p>
+
+  <!-- Table Header -->
+  <div class="builderPickTableHeader">
+    <div class="builderPickColName">Component Name</div>
+    <div class="builderPickColPrice">Price</div>
+    <div class="builderPickColAvail">Availability</div>
+    <div class="builderPickColSupplier">Supplier</div>
+    <div class="builderPickColActions"></div>
+  </div>
+
+  {% if components %}
+    {% for item in components %}
+    <div class="builderPickRow">
+      <div class="builderPickColName">{{ item.product_name }}</div>
+      <div class="builderPickColPrice">${{ item.price }}</div>
+      <div class="builderPickColAvail">
+        {% if item.availability == 'In stock' %}
+          <span style="color: #00b34a; font-weight: 600;">In Stock</span>
+        {% else %}
+          <span style="color: #e53935; font-weight: 600;">Out of Stock</span>
+        {% endif %}
+      </div>
+      <div class="builderPickColSupplier">{{ item.supplier_name }}</div>
+      <div class="builderPickColActions">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="list_part_id" value="{{ item.list_part_id }}">
+          <button type="submit" class="builderPickBtnAdd">Add to Build</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="builderPickRow">
+      <div class="builderPickColName" style="color: #999;">No compatible components found.</div>
+      <div class="builderPickColPrice"></div>
+      <div class="builderPickColAvail"></div>
+      <div class="builderPickColSupplier"></div>
+      <div class="builderPickColActions"></div>
+    </div>
+  {% endif %}
+
+</section>
+{% endblock %}

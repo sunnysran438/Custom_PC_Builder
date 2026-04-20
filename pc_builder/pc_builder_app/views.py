@@ -106,15 +106,179 @@ def logout(request):
 
 
 def builder(request):
-    build, created = Build.objects.get_or_create(id=1, defaults={"name": "My Build"})
-    items = BuildItem.objects.filter(build=build)
+    customer_id = request.session.get('customer_id')
+    if not customer_id:
+        return redirect('login')
 
-    return render(request, "builder.html", {"items": items})
+    error = None
+
+    if request.method == 'POST':
+        action = request.POST.get('action', '')
+        if action == 'create':
+            build_name = request.POST.get('build_name', '').strip()
+            if build_name:
+                new_id = database_api.create_build_list(customer_id, build_name)
+                if new_id:
+                    return redirect('builder_edit', list_number=new_id)
+                else:
+                    error = 'Failed to create build list.'
+            else:
+                error = 'Please enter a build name.'
+
+    builds = database_api.get_customer_builds(customer_id)
+    return render(request, 'builder_select.html', {
+        'builds': builds,
+        'error': error,
+    })
 
 
-def search(request):
-    components = Component.objects.all()
-    return render(request, "search_page.html", {"components": components})
+def builder_edit(request, list_number):
+    customer_id = request.session.get('customer_id')
+    if not customer_id:
+        return redirect('login')
+
+    build_name = database_api.get_build_name(list_number)
+    build_components = database_api.get_build_components(list_number)
+
+    # Define all component slots
+    slot_definitions = [
+        {'part_type': 'CPU', 'display_name': 'CPU'},
+        {'part_type': 'CPU_COOLER', 'display_name': 'CPU Cooler'},
+        {'part_type': 'MOTHERBOARD', 'display_name': 'Motherboard'},
+        {'part_type': 'RAM', 'display_name': 'Memory'},
+        {'part_type': 'STORAGE', 'display_name': 'Storage'},
+        {'part_type': 'GPU', 'display_name': 'GPU'},
+        {'part_type': 'PC_CASE', 'display_name': 'Case'},
+        {'part_type': 'POWER_SUPPLY_UNIT', 'display_name': 'Power Supply'},
+        {'part_type': 'FAN', 'display_name': 'Fan'},
+        {'part_type': 'WIFI_MODULE', 'display_name': 'Wifi Module'},
+    ]
+
+    # Map component types to part_type keys
+    type_map = {
+        'CPU': 'CPU', 'CPU Cooler': 'CPU_COOLER', 'Motherboard': 'MOTHERBOARD',
+        'RAM': 'RAM', 'Storage': 'STORAGE', 'GPU': 'GPU',
+        'Case': 'PC_CASE', 'Power Supply': 'POWER_SUPPLY_UNIT',
+        'Fan': 'FAN', 'Wifi Module': 'WIFI_MODULE',
+    }
+
+    # Build slots with selected components
+    slots = []
+    total_price = 0
+
+    for slot_def in slot_definitions:
+        slot = {
+            'part_type': slot_def['part_type'],
+            'display_name': slot_def['display_name'],
+            'selected': False,
+        }
+
+        for comp in build_components:
+            comp_key = type_map.get(comp['component_type'], '')
+            if comp_key == slot_def['part_type']:
+                slot['selected'] = True
+                slot['product_name'] = comp['product_name']
+                slot['price'] = comp['price']
+                slot['availability'] = comp['availability']
+                slot['supplier_name'] = comp['supplier_name']
+                slot['list_part_id'] = comp['list_part_id']
+                total_price += comp['price']
+                break
+
+        slots.append(slot)
+
+    return render(request, 'builder.html', {
+        'list_number': list_number,
+        'build_name': build_name,
+        'slots': slots,
+        'total_price': round(total_price, 2),
+    })
+
+
+def builder_select_part(request, list_number, part_type):
+    customer_id = request.session.get('customer_id')
+    if not customer_id:
+        return redirect('login')
+
+    type_display = {
+        'CPU': 'CPU', 'CPU_COOLER': 'CPU Cooler', 'MOTHERBOARD': 'Motherboard',
+        'RAM': 'Memory', 'STORAGE': 'Storage', 'GPU': 'GPU',
+        'PC_CASE': 'Case', 'POWER_SUPPLY_UNIT': 'Power Supply',
+        'FAN': 'Fan', 'WIFI_MODULE': 'Wifi Module',
+    }
+
+    if request.method == 'POST':
+        list_part_id = int(request.POST.get('list_part_id', 0))
+        print(f"Adding part {list_part_id} to build {list_number}")
+        result = database_api.add_to_build_list(list_number, list_part_id, 1)
+        print(f"Result: {result}")
+        return redirect('builder_edit', list_number=list_number)
+    
+    print(f"Selecting parts for build {list_number}, type {part_type}, customer {customer_id}")
+
+    components = database_api.get_compatible_store_items(list_number, customer_id, part_type)
+
+    print(f"Compatible components found: {components}")
+
+    raw_parts = database_api.get_compatible_part(list_number, customer_id, part_type)
+    print(f"Raw compatible parts: {raw_parts}")
+
+    return render(request, 'builder_pick.html', {
+        'list_number': list_number,
+        'part_type': part_type,
+        'part_type_display': type_display.get(part_type, part_type),
+        'components': components,
+    })
+
+
+def builder_remove(request, list_number, list_part_id):
+    if request.method == 'POST':
+        database_api.remove_from_build(list_number, list_part_id)
+    return redirect('builder_edit', list_number=list_number)
+
+def builder_delete(request, list_number):
+    if request.method == 'POST':
+        database_api.delete_build_list(list_number)
+    return redirect('builder')
+
+def customer_browse(request):
+    
+    selected_type = request.GET.get('type', '')
+    selected_manufacturer = request.GET.get('manufacturer', '')
+    selected_supplier = request.GET.get('supplier', '')
+    selected_availability = request.GET.get('availability', '')
+    selected_price = request.GET.get('price_range', '')
+    selected_rating = request.GET.get('rating', '')
+
+    components = database_api.get_store_components(
+       
+        selected_type, selected_manufacturer, selected_supplier,
+        selected_availability, selected_price, selected_rating
+    )
+   
+    manufacturers = database_api.get_manufacturers()
+    suppliers = database_api.get_suppliers()
+
+    return render(request, 'customer_browse.html', {
+       
+        'components': components,
+        'manufacturers': manufacturers,
+        'suppliers': suppliers,
+        'selected_type': selected_type,
+        'selected_manufacturer': selected_manufacturer,
+        'selected_supplier': selected_supplier,
+        'selected_availability': selected_availability,
+        'selected_price': selected_price,
+        'selected_rating': selected_rating,
+    
+    })
+
+
+def component_detail(request, list_part_id):
+    # placeholder for now
+    return render(request, 'component_detail.html', {
+        'list_part_id': list_part_id
+    })
 
 
 def add_component(request, component_id):
@@ -388,3 +552,41 @@ def delete_component(request, part_id):
     if request.method == 'POST':
         database_api.delete_component(part_id)
     return redirect('view_my_components')
+
+
+def component_detail(request, list_part_id):
+    component = database_api.get_component_detail(list_part_id)
+    if not component:
+        return redirect('customer_browse')
+
+    specs = database_api.get_component_specs(list_part_id)
+    customer_id = request.session.get('customer_id')
+    user_rating = None
+    error = None
+    success = None
+
+    if customer_id:
+        user_rating = database_api.get_user_rating(customer_id, list_part_id)
+
+    if request.method == 'POST' and customer_id:
+        rating_value = request.POST.get('rating', '')
+        if rating_value:
+            result = database_api.add_rating(customer_id, list_part_id, int(rating_value))
+            if result:
+                success = 'Rating submitted!'
+                user_rating = int(rating_value)
+                component = database_api.get_component_detail(list_part_id)
+            else:
+                error = 'Failed to submit rating.'
+        else:
+            error = 'Please select a rating.'
+    elif request.method == 'POST' and not customer_id:
+        error = 'Please log in to rate components.'
+
+    return render(request, 'component_detail.html', {
+        'component': component,
+        'specs': specs,
+        'user_rating': user_rating,
+        'error': error,
+        'success': success,
+    })
