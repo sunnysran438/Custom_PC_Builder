@@ -1243,12 +1243,11 @@
           </div>
     </div>
   
-    <button class="mfrAddBtn" id="mfrAddBtn" type="button">Add</button>
+     <input type="hidden" name="component_type" id="componentTypeInput" value="">
+     <button class="mfrAddBtn mfrFormHidden" id="mfrAddBtn" type="submit">Add</button>
   </section>
   
-  <input type="hidden" name="component_type" id="componentTypeInput" value="" >
-  
-  <button class="mfrAddBtn" id="mfrAddBtn" type="submit">Add</button>
+ 
 
 </form>
 {% endblock %}
@@ -1285,20 +1284,26 @@
   }
  
   componentSelect.addEventListener('change', function () {
-      document.getElementById('componentTypeInput').value = this.value;
-
+    
     var selectedValue = this.value;
+    document.getElementById('componentTypeInput').value = selectedValue;
     hideAllComponentFields();
- 
+
     if (!selectedValue || !componentMap[selectedValue]) {
-      formSection.classList.add('mfrFormHidden');
-      return;
+        
+        formSection.classList.add('mfrFormHidden');
+        document.getElementById('mfrAddBtn').classList.add('mfrFormHidden');
+        return;
     }
- 
+
     formSection.classList.remove('mfrFormHidden');
+    document.getElementById('mfrAddBtn').classList.remove('mfrFormHidden');
+   
     formTitle.textContent = componentMap[selectedValue].name;
     document.getElementById(componentMap[selectedValue].id).classList.remove('mfrFormHidden');
-  });
+  
+  }
+  );
  
   coolerTypeSelect.addEventListener('change', function () {
       document.getElementById('componentTypeInput').value = this.value;

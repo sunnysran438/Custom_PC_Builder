@@ -43,12 +43,21 @@ def login(request):
 
         if user_type == 'customer':
             user = database_api.get_customer_by_email(username, password)
-            
+
             if user:
-                request.session['customer_id'] = user[0]
-                request.session['customer_name'] = user[2]
-                request.session['user_type'] = 'customer'
-                return redirect('home')
+                    request.session['customer_id'] = user[0]
+                    request.session['customer_name'] = user[2]
+                    request.session['user_type'] = 'customer'
+
+                    # Check account status after setting session
+                    if len(user) > 11 and user[11] == 'inactive':
+                        return redirect('account')
+
+                    return redirect('home')
+
+
+            
+       
 
         elif user_type == 'manufacturer':
             user = database_api.get_manufacturer_by_name(username, password)
@@ -272,7 +281,62 @@ def customer_browse(request):
         'selected_rating': selected_rating,
     
     })
+def account(request):
+    customer_id = request.session.get('customer_id')
+    if not customer_id:
+        return redirect('login')
 
+    success = None
+    error = None
+
+    customer = database_api.get_customer_by_id(customer_id)
+    if not customer:
+        return redirect('login')
+
+    if request.method == 'POST':
+        result = database_api.update_customer(
+            customer_id,
+            request.POST.get('email', customer[1]),
+            request.POST.get('first_name', customer[2]),
+            request.POST.get('last_name', customer[3]),
+            request.POST.get('street', customer[4]),
+            request.POST.get('city', customer[5]),
+            request.POST.get('province', customer[6]),
+            request.POST.get('postal_code', customer[7]),
+            request.POST.get('country', customer[8]),
+            request.POST.get('phone', customer[9]),
+            request.POST.get('password', customer[10]),
+            request.POST.get('status', customer[11]),
+        )
+
+        if result:
+            success = 'Account updated successfully.'
+            # If user set status to inactive, log them out
+            if request.POST.get('status') == 'inactive':
+                success = 'Account set to inactive. You can only access this page until you reactivate.'
+            # Refresh customer data
+            customer = database_api.get_customer_by_id(customer_id)
+            request.session['customer_name'] = customer[2]
+        else:
+            error = 'Failed to update account.'
+
+    return render(request, 'account.html', {
+        'customer': {
+            'email': customer[1],
+            'first_name': customer[2],
+            'last_name': customer[3],
+            'street': customer[4],
+            'city': customer[5],
+            'province': customer[6],
+            'postal_code': customer[7],
+            'country': customer[8],
+            'phone': customer[9],
+            'password': customer[10],
+            'status': customer[11] if len(customer) > 11 else 'active',
+        },
+        'success': success,
+        'error': error,
+    })
 
 def component_detail(request, list_part_id):
     # placeholder for now
@@ -589,4 +653,109 @@ def component_detail(request, list_part_id):
         'user_rating': user_rating,
         'error': error,
         'success': success,
+    })
+
+def manufacturer_edit(request, list_part_id):
+    manufacturer_id = request.session.get('manufacturer_id')
+    if not manufacturer_id:
+        return redirect('login')
+
+    component_type_key, data = database_api.get_component_data(list_part_id)
+    if not data:
+        return redirect('view_my_components')
+
+    type_display = {
+        'cpu': 'CPU', 'gpu': 'GPU', 'motherboard': 'Motherboard',
+        'ram': 'RAM', 'storage': 'Storage', 'psu': 'Power Supply',
+        'case': 'Case', 'cpu_cooler': 'CPU Cooler', 'fan': 'Fan',
+        'ethernet_controller': 'Ethernet Controller', 'wifi_module': 'Wifi Module',
+    }
+
+    if request.method == 'POST':
+        comp_type = request.POST.get('component_type', '')
+        product_name = request.POST.get('product_name', '')
+        success = False
+
+        if comp_type == 'cpu':
+            success = database_api.update_cpu(
+                list_part_id, product_name,
+                request.POST['chip_family'], request.POST['series'],
+                safe_int(request.POST['tdp']), safe_int(request.POST['base_clock']),
+                safe_int(request.POST['boost_clock']), safe_int(request.POST['l1_cache']),
+                safe_int(request.POST['l2_cache']), safe_int(request.POST['l3_cache']),
+                safe_int(request.POST['num_cores']), safe_int(request.POST['num_threads']),
+                request.POST['architecture'], request.POST['socket_type'],
+                safe_int(request.POST['ram_type'])
+            )
+        elif comp_type == 'gpu':
+            success = database_api.update_gpu(
+                list_part_id, product_name,
+                request.POST['series'], request.POST['architecture'],
+                safe_int(request.POST['base_clock']), safe_int(request.POST['boost_clock']),
+                safe_int(request.POST['memory_size']), safe_int(request.POST['memory_type']),
+                safe_int(request.POST['num_cores']), safe_int(request.POST['power_consumption']),
+                safe_int(request.POST['pci_type_id'])
+            )
+        elif comp_type == 'motherboard':
+            success = database_api.update_motherboard(
+                list_part_id, product_name,
+                safe_int(request.POST['num_ram_slots']), request.POST['chipset_name'],
+                safe_int(request.POST['num_sata_connectors']), safe_int(request.POST['num_cooler_headers']),
+                safe_int(request.POST['num_fan_headers']), request.POST['form_factor'],
+                request.POST['socket_type'], safe_int(request.POST['ram_type'])
+            )
+        elif comp_type == 'ram':
+            success = database_api.update_ram(
+                list_part_id, product_name,
+                safe_int(request.POST['capacity']), safe_int(request.POST['max_freq']),
+                safe_int(request.POST['ram_type'])
+            )
+        elif comp_type == 'storage':
+            success = database_api.update_storage(
+                list_part_id, product_name,
+                safe_int(request.POST['capacity']), safe_int(request.POST['read_speed']),
+                safe_int(request.POST['write_speed']), request.POST['form_factor']
+            )
+        elif comp_type == 'psu':
+            success = database_api.update_psu(
+                list_part_id, product_name,
+                safe_int(request.POST['power_rating']), safe_int(request.POST['modular']),
+                safe_int(request.POST['length_mm'])
+            )
+        elif comp_type == 'case':
+            success = database_api.update_case(
+                list_part_id, product_name,
+                safe_int(request.POST['height']), safe_int(request.POST['width']),
+                safe_int(request.POST['len_case']), request.POST['material'],
+                safe_int(request.POST['num_35_bays']), safe_int(request.POST['num_25_bays']),
+                safe_int(request.POST['max_gpu_len_mm']), safe_int(request.POST['max_psu_len_mm']),
+                safe_int(request.POST['max_air_cooler_height'])
+            )
+        elif comp_type == 'cpu_cooler':
+            success = database_api.update_cpu_cooler(
+                list_part_id, product_name,
+                safe_int(request.POST['noise_level'])
+            )
+        elif comp_type == 'fan':
+            success = database_api.update_fan(
+                list_part_id, product_name,
+                safe_int(request.POST['fan_rpm']), float(request.POST.get('noise_level', 0)),
+                safe_int(request.POST['size_category_mm'])
+            )
+        elif comp_type == 'ethernet_controller':
+            success = database_api.update_ethernet_controller(list_part_id, product_name)
+        elif comp_type == 'wifi_module':
+            success = database_api.update_wifi_module(
+                list_part_id, product_name,
+                safe_int(request.POST['pci_type_id'])
+            )
+
+        if success:
+            return redirect('view_my_components')
+
+    return render(request, 'manufacturer_edit.html', {
+        'list_part_id': list_part_id,
+        'component_type_key': component_type_key,
+        'component_type': type_display.get(component_type_key, component_type_key),
+        'data': data,
     })

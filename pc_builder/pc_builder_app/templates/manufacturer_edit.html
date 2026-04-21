@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit {{ component_type }} - PC Component Builder{% endblock %}
+
+{% block extra_head %}
+<style>
+  .mfrFormHidden {
+    display: none;
+  }
+
+  .mfrEditSection {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .mfrEditBack {
+    font-size: 14px;
+    color: #0156FF;
+    display: inline-block;
+    margin-bottom: 20px;
+    transition: opacity 0.2s;
+  }
+
+  .mfrEditBack:hover {
+    opacity: 0.7;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="mfrEditSection">
+  <a href="{% url 'view_my_components' %}" class="mfrEditBack">‹ Back to My Components</a>
+  <h1>Edit {{ component_type }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="list_part_id" value="{{ list_part_id }}">
+    <input type="hidden" name="component_type" value="{{ component_type_key }}">
+
+    <!-- Shared Fields -->
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Product Name</label>
+        <input type="text" class="mfrFormInput" name="product_name" value="{{ data.product_name }}">
+      </div>
+    </div>
+
+    {% if component_type_key == 'cpu' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Chip Family</label>
+        <select class="mfrFormSelect" name="chip_family">
+          <option value="">Select option</option>
+          {% for opt in "Ryzen,Threadripper,EPYC,Athlon,Core,Core Ultra,Xeon,Pentium,Celeron"|make_list %}{% endfor %}
+          <option value="Ryzen" {% if data.chip_family == 'Ryzen' %}selected{% endif %}>Ryzen</option>
+          <option value="Threadripper" {% if data.chip_family == 'Threadripper' %}selected{% endif %}>Threadripper</option>
+          <option value="EPYC" {% if data.chip_family == 'EPYC' %}selected{% endif %}>EPYC</option>
+          <option value="Athlon" {% if data.chip_family == 'Athlon' %}selected{% endif %}>Athlon</option>
+          <option value="Core" {% if data.chip_family == 'Core' %}selected{% endif %}>Core</option>
+          <option value="Core Ultra" {% if data.chip_family == 'Core Ultra' %}selected{% endif %}>Core Ultra</option>
+          <option value="Xeon" {% if data.chip_family == 'Xeon' %}selected{% endif %}>Xeon</option>
+          <option value="Pentium" {% if data.chip_family == 'Pentium' %}selected{% endif %}>Pentium</option>
+          <option value="Celeron" {% if data.chip_family == 'Celeron' %}selected{% endif %}>Celeron</option>
+        </select>
+      </div>
+      <div class="mfrFormGroup">
+        <label>Series</label>
+        <input type="text" class="mfrFormInput" name="series" value="{{ data.series }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>TDP (Watts)</label>
+        <input type="number" class="mfrFormInput" name="tdp" value="{{ data.tdp }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Base Clock (MHz)</label>
+        <input type="number" class="mfrFormInput" name="base_clock" value="{{ data.base_clock }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Boost Clock (MHz)</label>
+        <input type="number" class="mfrFormInput" name="boost_clock" value="{{ data.boost_clock }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>L1 Cache (KB)</label>
+        <input type="number" class="mfrFormInput" name="l1_cache" value="{{ data.l1_cache }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>L2 Cache (MB)</label>
+        <input type="number" class="mfrFormInput" name="l2_cache" value="{{ data.l2_cache }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>L3 Cache (MB)</label>
+        <input type="number" class="mfrFormInput" name="l3_cache" value="{{ data.l3_cache }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Number of Cores</label>
+        <input type="number" class="mfrFormInput" name="num_cores" value="{{ data.num_cores }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Number of Threads</label>
+        <input type="number" class="mfrFormInput" name="num_threads" value="{{ data.num_threads }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Architecture</label>
+        <input type="text" class="mfrFormInput" name="architecture" value="{{ data.architecture }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Socket Type</label>
+        <input type="text" class="mfrFormInput" name="socket_type" value="{{ data.socket_type }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>RAM Type</label>
+        <input type="number" class="mfrFormInput" name="ram_type" value="{{ data.ram_type }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'gpu' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Series</label>
+        <input type="text" class="mfrFormInput" name="series" value="{{ data.series }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Architecture</label>
+        <input type="text" class="mfrFormInput" name="architecture" value="{{ data.architecture }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Base Clock (MHz)</label>
+        <input type="number" class="mfrFormInput" name="base_clock" value="{{ data.base_clock }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Boost Clock (MHz)</label>
+        <input type="number" class="mfrFormInput" name="boost_clock" value="{{ data.boost_clock }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Memory Size (GB)</label>
+        <input type="number" class="mfrFormInput" name="memory_size" value="{{ data.memory_size }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Memory Type</label>
+        <input type="number" class="mfrFormInput" name="memory_type" value="{{ data.memory_type }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Number of Cores</label>
+        <input type="number" class="mfrFormInput" name="num_cores" value="{{ data.num_cores }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Power Consumption (W)</label>
+        <input type="number" class="mfrFormInput" name="power_consumption" value="{{ data.power_consumption }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>PCIe Type ID</label>
+        <input type="number" class="mfrFormInput" name="pci_type_id" value="{{ data.pci_type_id }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'motherboard' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Chipset Name</label>
+        <input type="text" class="mfrFormInput" name="chipset_name" value="{{ data.chipset_name }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>RAM Slots</label>
+        <input type="number" class="mfrFormInput" name="num_ram_slots" value="{{ data.num_ram_slots }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>SATA Connectors</label>
+        <input type="number" class="mfrFormInput" name="num_sata_connectors" value="{{ data.num_sata_connectors }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Cooler Headers</label>
+        <input type="number" class="mfrFormInput" name="num_cooler_headers" value="{{ data.num_cooler_headers }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Fan Headers</label>
+        <input type="number" class="mfrFormInput" name="num_fan_headers" value="{{ data.num_fan_headers }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Form Factor</label>
+        <input type="text" class="mfrFormInput" name="form_factor" value="{{ data.form_factor }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Socket Type</label>
+        <input type="text" class="mfrFormInput" name="socket_type" value="{{ data.socket_type }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>RAM Type</label>
+        <input type="number" class="mfrFormInput" name="ram_type" value="{{ data.ram_type }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'ram' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Capacity (GB)</label>
+        <input type="number" class="mfrFormInput" name="capacity" value="{{ data.capacity }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Max Frequency (MHz)</label>
+        <input type="number" class="mfrFormInput" name="max_freq" value="{{ data.max_freq }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>RAM Type</label>
+        <input type="number" class="mfrFormInput" name="ram_type" value="{{ data.ram_type }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'storage' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Capacity (GB)</label>
+        <input type="number" class="mfrFormInput" name="capacity" value="{{ data.capacity }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Read Speed (MB/s)</label>
+        <input type="number" class="mfrFormInput" name="read_speed" value="{{ data.read_speed }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Write Speed (MB/s)</label>
+        <input type="number" class="mfrFormInput" name="write_speed" value="{{ data.write_speed }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Form Factor</label>
+        <input type="text" class="mfrFormInput" name="form_factor" value="{{ data.form_factor }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'psu' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Power Rating (W)</label>
+        <input type="number" class="mfrFormInput" name="power_rating" value="{{ data.power_rating }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Modular</label>
+        <select class="mfrFormSelect" name="modular">
+          <option value="1" {% if data.modular == 1 %}selected{% endif %}>Full Modular</option>
+          <option value="0" {% if data.modular == 0 %}selected{% endif %}>Non-Modular</option>
+        </select>
+      </div>
+      <div class="mfrFormGroup">
+        <label>Length (mm)</label>
+        <input type="number" class="mfrFormInput" name="length_mm" value="{{ data.length_mm }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'case' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Height (mm)</label>
+        <input type="number" class="mfrFormInput" name="height" value="{{ data.height }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Width (mm)</label>
+        <input type="number" class="mfrFormInput" name="width" value="{{ data.width }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Length (mm)</label>
+        <input type="number" class="mfrFormInput" name="len_case" value="{{ data.len_case }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Material</label>
+        <input type="text" class="mfrFormInput" name="material" value="{{ data.material }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>3.5" Drive Bays</label>
+        <input type="number" class="mfrFormInput" name="num_35_bays" value="{{ data.num_35_bays }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>2.5" Drive Bays</label>
+        <input type="number" class="mfrFormInput" name="num_25_bays" value="{{ data.num_25_bays }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Max GPU Length (mm)</label>
+        <input type="number" class="mfrFormInput" name="max_gpu_len_mm" value="{{ data.max_gpu_len_mm }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Max PSU Length (mm)</label>
+        <input type="number" class="mfrFormInput" name="max_psu_len_mm" value="{{ data.max_psu_len_mm }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Max Cooler Height (mm)</label>
+        <input type="number" class="mfrFormInput" name="max_air_cooler_height" value="{{ data.max_air_cooler_height }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'cpu_cooler' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Noise Level (dBA)</label>
+        <input type="number" class="mfrFormInput" name="noise_level" value="{{ data.noise_level }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'fan' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Fan RPM</label>
+        <input type="number" class="mfrFormInput" name="fan_rpm" value="{{ data.fan_rpm }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Noise Level (dBA)</label>
+        <input type="number" class="mfrFormInput" name="noise_level" value="{{ data.noise_level }}">
+      </div>
+      <div class="mfrFormGroup">
+        <label>Fan Size (mm)</label>
+        <input type="number" class="mfrFormInput" name="size_category_mm" value="{{ data.size_category_mm }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'ethernet_controller' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>Product Name</label>
+        <input type="text" class="mfrFormInput" name="product_name" value="{{ data.product_name }}">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if component_type_key == 'wifi_module' %}
+    <div class="mfrFormGrid">
+      <div class="mfrFormGroup">
+        <label>PCIe Type ID</label>
+        <input type="number" class="mfrFormInput" name="pci_type_id" value="{{ data.pci_type_id }}">
+      </div>
+    </div>
+    {% endif %}
+
+    <button class="mfrAddBtn" type="submit">Update</button>
+  </form>
+</section>
+{% endblock %}

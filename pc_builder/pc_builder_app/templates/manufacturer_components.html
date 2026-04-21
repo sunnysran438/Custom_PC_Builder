@@ -25,11 +25,11 @@
       <div class="mfrViewColType">{{ component.component_type }}</div>
       <div class="mfrViewColActions">
         
-        <a href="{% url 'manufacturer' %}">
-          <button class="mfrViewBtnEdit">Edit</button>
-        </a>
+      <a href="{% url 'manufacturer_edit' component.list_part_id %}">
+        <button class="mfrViewBtnEdit">Edit</button>
+      </a>
         
-        <form method="post" action="{% url 'delete_component' component.part_id %}" style="display: inline;">
+        <form method="post" action="{% url 'delete_component' component.list_part_id %}" style="display: inline;">
           {% csrf_token %}
           <button type="submit" class="mfrViewBtnRemove">Remove</button>
         </form>

@@ -24,10 +24,18 @@
  <ul class="navbarLinks">
     <li><a href="{% url 'customer_browse' %}">View Components</a></li>
 
-    {% if user_type != 'manufacturer' and user_type != 'supplier' %}
-      <li><a href="#">View Build List</a></li>
-      <li><a href="{% url 'builder' %}">Builder</a></li>
-    {% endif %}
+    {% if user_type == 'customer' and account_status == 'inactive' %}
+        <li><a href="{% url 'account' %}">My Account</a></li>
+    
+       {% elif user_type != 'manufacturer' and user_type != 'supplier' %}
+        
+        <li><a href="{% url 'builder' %}">Builder</a></li>
+    
+      {% if user_type == 'customer' %}
+        <li><a href="{% url 'account' %}">My Account</a></li>
+      {% endif %}
+   
+      {% endif %}
 
     {% if user_type == 'manufacturer' %}
       <li><a href="{% url 'manufacturer' %}">Add Component</a></li>
@@ -48,11 +56,14 @@
   </ul>
 
     <div class="navbarActions">
+       <a href="{% url 'customer_browse' %}">
       <button class="searchBtn" type="button" aria-label="Search">
         <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
         </svg>
       </button>
+      </a>
+     
 
 
       {% if user_type == 'customer' %}
@@ -65,11 +76,8 @@
 
 
 
-      <div class="profileIcon" aria-hidden="true">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#888" stroke="none">
-          <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
-        </svg>
-      </div>
+     
+
     </div>
   </nav>
 

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Account - PC Component Builder{% endblock %}
+
+{% block content %}
+<section class="registerSection">
+  <h1>My Account</h1>
+
+  {% if success %}
+    <p style="color: #00b34a; margin-bottom: 16px;">{{ success }}</p>
+  {% endif %}
+
+  {% if error %}
+    <p style="color: red; margin-bottom: 16px;">{{ error }}</p>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="regFormGroup">
+      <label>Email Address</label>
+      <input type="email" name="email" value="{{ customer.email }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>First Name</label>
+      <input type="text" name="first_name" value="{{ customer.first_name }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>Last Name</label>
+      <input type="text" name="last_name" value="{{ customer.last_name }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>Street Address</label>
+      <input type="text" name="street" value="{{ customer.street }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>City</label>
+      <input type="text" name="city" value="{{ customer.city }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>State/Province</label>
+      <input type="text" name="province" value="{{ customer.province }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>Zip/Postal Code</label>
+      <input type="text" name="postal_code" value="{{ customer.postal_code }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>Country</label>
+      <input type="text" name="country" value="{{ customer.country }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>Phone Number</label>
+      <input type="tel" name="phone" value="{{ customer.phone }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>Password</label>
+      <input type="password" name="password" value="{{ customer.password }}">
+    </div>
+
+    <div class="regFormGroup">
+      <label>Account Status</label>
+      <select name="status" style="width: 580px; height: 40px; padding: 0 12px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Poppins', sans-serif; font-size: 14px;">
+        <option value="active" {% if customer.status == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if customer.status == 'inactive' %}selected{% endif %}>Inactive</option>
+      </select>
+    </div>
+
+    <button type="submit" class="regBtnSignup">Update Account</button>
+  </form>
+</section>
+{% endblock %}

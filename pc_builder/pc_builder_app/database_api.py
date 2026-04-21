@@ -99,6 +99,7 @@ CREATE TABLE CUSTOMER(
     country VARCHAR(63) NOT NULL,
     phone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
+    status VARCHAR(255) NOT NULL,  
     PRIMARY KEY(customer_id)
 );
 
@@ -463,7 +464,7 @@ CREATE TABLE CASE_FAN_SIZE_COMPATIBLE(
 -- User tables #####################################################################
 
 -- (custID, 'email', 'firstname', 'lastname', 'street', 'city', 'province', 'postal_code', 'country', 'phone', 'password')
-INSERT INTO CUSTOMER VALUES(1, 'art@email.com', 'Art', 'Vandeley', '123-routeway', 'New York', 'New York', 'A0A 0A0', 'U.S.A', '555-1234', 'password123');
+INSERT INTO CUSTOMER VALUES(1, 'art@email.com', 'Art', 'Vandeley', '123-routeway', 'New York', 'New York', 'A0A 0A0', 'U.S.A', '555-1234', 'password123','active');
 
 -- (manid, 'name', 'password')
 INSERT INTO MANUFACTURER VALUES
@@ -890,7 +891,8 @@ def get_components_by_manufacturer(manufacturer_id):
     cursor = conn.cursor()
 
     query_string = f"""
-        SELECT c.part_id, 
+            SELECT c.part_id, c.list_part_id,
+ 
                COALESCE(cpu.product_name, gpu.product_name, mb.product_name, 
                         ram.product_name, sto.product_name, psu.product_name, 
                         pc.product_name, fan.product_name, cool.product_name,
@@ -934,12 +936,16 @@ def get_components_by_manufacturer(manufacturer_id):
     conn.close()
 
     components = []
+    
     for row in results:
+        
         components.append({
             'part_id': row[0],
-            'product_name': row[1],
-            'component_type': row[2]
+            'list_part_id': row[1],
+            'product_name': row[2],
+            'component_type': row[3],
         })
+    
     return components
 
 
@@ -1810,6 +1816,43 @@ def delete_customer(customer_id:int)->bool:
     conn.commit()
     conn.close()
 
+    return True
+
+def get_customer_by_id(customer_id):
+    """Get a customer by their ID"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(f"SELECT * FROM CUSTOMER WHERE customer_id = {customer_id}")
+        row = cursor.fetchone()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return None
+
+    conn.close()
+    return row
+
+
+def update_customer(customer_id, email, first_name, last_name, street, city, province, postal_code, country, phone, password, status):
+    """Update a customer's information"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            UPDATE CUSTOMER SET email = ?, first_name = ?, last_name = ?, street = ?, city = ?, 
+            province = ?, postal_code = ?, country = ?, phone = ?, password = ?, status = ?
+            WHERE customer_id = ?
+        """, (email, first_name, last_name, street, city, province, postal_code, country, phone, password, status, customer_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"query error: {e}")
+        conn.close()
+        return False
+
+    conn.close()
     return True
 
 
@@ -3327,4 +3370,208 @@ def delete_part(list_part_id : int) -> bool:
     conn.commit()
     conn.close()
 
+    return True
+
+
+
+#### methods for updadting a component 
+
+def get_component_data(list_part_id):
+    """Get a component's data and type for editing"""
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+
+    tables = {
+        'CPU': {'key': 'cpu', 'columns': ['list_part_id', 'product_name', 'chip_family', 'series', 'tdp', 'base_clock', 'boost_clock', 'l1_cache', 'l2_cache', 'l3_cache', 'num_cores', 'num_threads', 'architecture', 'socket_type', 'ram_type']},
+        'GPU': {'key': 'gpu', 'columns': ['list_part_id', 'product_name', 'series', 'architecture', 'base_clock', 'boost_clock', 'memory_size', 'memory_type', 'num_cores', 'power_consumption', 'pci_type_id']},
+        'MOTHERBOARD': {'key': 'motherboard', 'columns': ['list_part_id', 'product_name', 'num_ram_slots', 'chipset_name', 'num_sata_connectors', 'num_cooler_headers', 'num_fan_headers', 'form_factor', 'socket_type', 'ram_type', 'ethernet_con_id']},
+        'RAM': {'key': 'ram', 'columns': ['list_part_id', 'product_name', 'capacity', 'max_freq', 'ram_type']},
+        'STORAGE': {'key': 'storage', 'columns': ['list_part_id', 'product_name', 'capacity', 'read_speed', 'write_speed', 'form_factor']},
+        'POWER_SUPPLY_UNIT': {'key': 'psu', 'columns': ['list_part_id', 'product_name', 'power_rating', 'modular', 'length_mm']},
+        'PC_CASE': {'key': 'case', 'columns': ['list_part_id', 'product_name', 'height', 'width', 'len_case', 'material', 'num_35_bays', 'num_25_bays', 'max_gpu_len_mm', 'max_psu_len_mm', 'max_air_cooler_height']},
+        'FAN': {'key': 'fan', 'columns': ['list_part_id', 'product_name', 'fan_rpm', 'noise_level', 'size_category_mm']},
+        'CPU_COOLER': {'key': 'cpu_cooler', 'columns': ['list_part_id', 'product_name', 'noise_level']},
+        'ETHERNET_CONTROLLER': {'key': 'ethernet_controller', 'columns': ['list_part_id', 'product_name']},
+        'WIFI_MODULE': {'key': 'wifi_module', 'columns': ['list_part_id', 'product_name', 'pci_type_id']},
+    }
+
+    for table, info in tables.items():
+        try:
+            cursor.execute(f"SELECT * FROM {table} WHERE list_part_id = {list_part_id}")
+            row = cursor.fetchone()
+            if row:
+                data = {}
+                for i, col in enumerate(info['columns']):
+                    data[col] = row[i]
+                conn.close()
+                return info['key'], data
+        except sqlite3.Error as e:
+            continue
+
+    conn.close()
+    return None, None
+
+
+def update_cpu(list_part_id, product_name, chip_family, series, tdp, base_clock, boost_clock, l1_cache, l2_cache, l3_cache, num_cores, num_threads, architecture, socket_type, ram_type):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE CPU SET product_name=?, chip_family=?, series=?, TDP=?, base_clock=?, boost_clock=?, l1_cache=?, l2_cache=?, l3_cache=?, num_cores=?, num_threads=?, architecture=?, socket_type=?, ram_type=? WHERE list_part_id=?""",
+            (product_name, chip_family, series, tdp, base_clock, boost_clock, l1_cache, l2_cache, l3_cache, num_cores, num_threads, architecture, socket_type, ram_type, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_gpu(list_part_id, product_name, series, architecture, base_clock, boost_clock, memory_size, memory_type, num_cores, power_consumption, pci_type_id):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE GPU SET product_name=?, series=?, architecture=?, base_clock=?, boost_clock=?, memory_size=?, memory_type=?, num_cores=?, power_consumption=?, pci_type_id=? WHERE list_part_id=?""",
+            (product_name, series, architecture, base_clock, boost_clock, memory_size, memory_type, num_cores, power_consumption, pci_type_id, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_motherboard(list_part_id, product_name, num_ram_slots, chipset_name, num_sata_connectors, num_cooler_headers, num_fan_headers, form_factor, socket_type, ram_type):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE MOTHERBOARD SET product_name=?, num_ram_slots=?, chipset_name=?, num_SATA_connectors=?, num_cooler_headers=?, num_fan_headers=?, form_factor=?, socket_type=?, ram_type=? WHERE list_part_id=?""",
+            (product_name, num_ram_slots, chipset_name, num_sata_connectors, num_cooler_headers, num_fan_headers, form_factor, socket_type, ram_type, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_ram(list_part_id, product_name, capacity, max_freq, ram_type):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE RAM SET product_name=?, capacity=?, max_freq=?, ram_type=? WHERE list_part_id=?""",
+            (product_name, capacity, max_freq, ram_type, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_storage(list_part_id, product_name, capacity, read_speed, write_speed, form_factor):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE STORAGE SET product_name=?, capacity=?, read_speed=?, write_speed=?, form_factor=? WHERE list_part_id=?""",
+            (product_name, capacity, read_speed, write_speed, form_factor, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_psu(list_part_id, product_name, power_rating, modular, length_mm):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE POWER_SUPPLY_UNIT SET product_name=?, power_rating=?, modular=?, length_mm=? WHERE list_part_id=?""",
+            (product_name, power_rating, modular, length_mm, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_case(list_part_id, product_name, height, width, len_case, material, num_35_bays, num_25_bays, max_gpu_len_mm, max_psu_len_mm, max_air_cooler_height):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE PC_CASE SET product_name=?, height=?, width=?, len_case=?, material=?, num_35_bays=?, num_25_bays=?, max_gpu_len_mm=?, max_psu_len_mm=?, max_air_cooler_height=? WHERE list_part_id=?""",
+            (product_name, height, width, len_case, material, num_35_bays, num_25_bays, max_gpu_len_mm, max_psu_len_mm, max_air_cooler_height, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_fan(list_part_id, product_name, fan_rpm, noise_level, size_category_mm):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE FAN SET product_name=?, fan_rpm=?, noise_level=?, size_category_mm=? WHERE list_part_id=?""",
+            (product_name, fan_rpm, noise_level, size_category_mm, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_cpu_cooler(list_part_id, product_name, noise_level):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE CPU_COOLER SET product_name=?, nosie_level=? WHERE list_part_id=?""",
+            (product_name, noise_level, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_ethernet_controller(list_part_id, product_name):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE ETHERNET_CONTROLLER SET product_name=? WHERE list_part_id=?""",
+            (product_name, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
+    return True
+
+
+def update_wifi_module(list_part_id, product_name, pci_type_id):
+    conn = sqlite3.connect("parts_picker.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""UPDATE WIFI_MODULE SET product_name=?, pci_type_id=? WHERE list_part_id=?""",
+            (product_name, pci_type_id, list_part_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error: {e}")
+        conn.close()
+        return False
+    conn.close()
     return True
