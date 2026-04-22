@@ -1784,7 +1784,7 @@ def add_customer(email, first_name, last_name, street, city, province, postal_co
     new_id = current_max + 1
     
     # command for adding the customer
-    query_string = f"INSERT INTO CUSTOMER VALUES ({new_id}, '{email}', '{first_name}', '{last_name}', '{street}', '{city}', '{province}', '{postal_code}', '{country}', '{phone}', '{password}')"
+    query_string = f"INSERT INTO CUSTOMER VALUES ({new_id}, '{email}', '{first_name}', '{last_name}', '{street}', '{city}', '{province}', '{postal_code}', '{country}', '{phone}', '{password}','active')"
     try:
         cursor.execute(query_string)
         results = cursor.fetchall()

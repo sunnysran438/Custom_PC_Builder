@@ -539,20 +539,16 @@
     
     /* ========== REGISTRATION PAGE ONLY ========== */
 
-        .registerSection {
-            
-            padding: 60px 120px 80px;
-            padding-left: 50px;
-            padding-right: 150px;
-            
-            background: #F5F7FF;
-            
-            margin-top: 2%;
-            margin-bottom: 2%;
-            margin-left: 25%;
-            margin-right: 25%;
-            
-        }
+         .registerSection {
+             
+            padding: 60px 50px 80px;
+             background: #F5F7FF;
+             
+             margin-top: 2%;
+             margin-bottom: 2%;
+             margin-left: 25%;
+             margin-right: 25%;
+         }
 
        
 
@@ -585,7 +581,9 @@
     
         .regFormGroup input {
             
-            width: 120%;
+            width: 100%;
+            box-sizing: border-box;
+            
             height: 40px;
             padding: 0 12px;
             
